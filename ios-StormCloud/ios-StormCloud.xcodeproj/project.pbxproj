@@ -14,6 +14,9 @@
 		2B6A6ED11FAFBDF7002D4003 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2B6A6ECF1FAFBDF7002D4003 /* LaunchScreen.storyboard */; };
 		2B6A6EDC1FAFBDF8002D4003 /* ios_StormCloudTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B6A6EDB1FAFBDF8002D4003 /* ios_StormCloudTests.swift */; };
 		2B6A6EE71FAFBDF8002D4003 /* ios_StormCloudUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B6A6EE61FAFBDF8002D4003 /* ios_StormCloudUITests.swift */; };
+		2B86ECB4D0D714F3CC38EFC9 /* Pods_ios_StormCloudUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7400C512E4B1499A849FB0EF /* Pods_ios_StormCloudUITests.framework */; };
+		79D6AF13620E24B22CA1EA1C /* Pods_ios_StormCloud.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4B94D9396ED5D702A7153CA /* Pods_ios_StormCloud.framework */; };
+		ED8116C2B7E2F9E81FBCA531 /* Pods_ios_StormCloudTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6F51C741D23FD69601947E9 /* Pods_ios_StormCloudTests.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,6 +37,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		07E8EC847031D667B184EA3C /* Pods-ios-StormCloudUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios-StormCloudUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ios-StormCloudUITests/Pods-ios-StormCloudUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		1C104AD5E57CD835835EDD2D /* Pods-ios-StormCloudUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios-StormCloudUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-ios-StormCloudUITests/Pods-ios-StormCloudUITests.release.xcconfig"; sourceTree = "<group>"; };
+		28C20A3EDD686EB4DF76D88E /* Pods-ios-StormCloudTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios-StormCloudTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ios-StormCloudTests/Pods-ios-StormCloudTests.debug.xcconfig"; sourceTree = "<group>"; };
 		2B6A6EC31FAFBDF7002D4003 /* ios-StormCloud.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ios-StormCloud.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B6A6EC61FAFBDF7002D4003 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2B6A6EC81FAFBDF7002D4003 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -47,6 +53,12 @@
 		2B6A6EE21FAFBDF8002D4003 /* ios-StormCloudUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ios-StormCloudUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B6A6EE61FAFBDF8002D4003 /* ios_StormCloudUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ios_StormCloudUITests.swift; sourceTree = "<group>"; };
 		2B6A6EE81FAFBDF8002D4003 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6AF997C2080D737F0F168EC8 /* Pods-ios-StormCloud.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios-StormCloud.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ios-StormCloud/Pods-ios-StormCloud.debug.xcconfig"; sourceTree = "<group>"; };
+		731AAFEE2650629CD8071615 /* Pods-ios-StormCloud.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios-StormCloud.release.xcconfig"; path = "Pods/Target Support Files/Pods-ios-StormCloud/Pods-ios-StormCloud.release.xcconfig"; sourceTree = "<group>"; };
+		7400C512E4B1499A849FB0EF /* Pods_ios_StormCloudUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ios_StormCloudUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9C5260EB6204AB2A0B2FF8E1 /* Pods-ios-StormCloudTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios-StormCloudTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-ios-StormCloudTests/Pods-ios-StormCloudTests.release.xcconfig"; sourceTree = "<group>"; };
+		A4B94D9396ED5D702A7153CA /* Pods_ios_StormCloud.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ios_StormCloud.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A6F51C741D23FD69601947E9 /* Pods_ios_StormCloudTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ios_StormCloudTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +66,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				79D6AF13620E24B22CA1EA1C /* Pods_ios_StormCloud.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -61,6 +74,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ED8116C2B7E2F9E81FBCA531 /* Pods_ios_StormCloudTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -68,6 +82,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2B86ECB4D0D714F3CC38EFC9 /* Pods_ios_StormCloudUITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -81,6 +96,8 @@
 				2B6A6EDA1FAFBDF8002D4003 /* ios-StormCloudTests */,
 				2B6A6EE51FAFBDF8002D4003 /* ios-StormCloudUITests */,
 				2B6A6EC41FAFBDF7002D4003 /* Products */,
+				AF4E352F42C65EEA7D283042 /* Pods */,
+				E7D93CC61DB8CD257F51BA67 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -125,6 +142,29 @@
 			path = "ios-StormCloudUITests";
 			sourceTree = "<group>";
 		};
+		AF4E352F42C65EEA7D283042 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				6AF997C2080D737F0F168EC8 /* Pods-ios-StormCloud.debug.xcconfig */,
+				731AAFEE2650629CD8071615 /* Pods-ios-StormCloud.release.xcconfig */,
+				28C20A3EDD686EB4DF76D88E /* Pods-ios-StormCloudTests.debug.xcconfig */,
+				9C5260EB6204AB2A0B2FF8E1 /* Pods-ios-StormCloudTests.release.xcconfig */,
+				07E8EC847031D667B184EA3C /* Pods-ios-StormCloudUITests.debug.xcconfig */,
+				1C104AD5E57CD835835EDD2D /* Pods-ios-StormCloudUITests.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		E7D93CC61DB8CD257F51BA67 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A4B94D9396ED5D702A7153CA /* Pods_ios_StormCloud.framework */,
+				A6F51C741D23FD69601947E9 /* Pods_ios_StormCloudTests.framework */,
+				7400C512E4B1499A849FB0EF /* Pods_ios_StormCloudUITests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -132,9 +172,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2B6A6EEB1FAFBDF8002D4003 /* Build configuration list for PBXNativeTarget "ios-StormCloud" */;
 			buildPhases = (
+				C79C307C30A956DC5AD7C73B /* [CP] Check Pods Manifest.lock */,
 				2B6A6EBF1FAFBDF7002D4003 /* Sources */,
 				2B6A6EC01FAFBDF7002D4003 /* Frameworks */,
 				2B6A6EC11FAFBDF7002D4003 /* Resources */,
+				89A68BFEE8C7E029574C6CB1 /* [CP] Embed Pods Frameworks */,
+				F38B307CAF44710FA902D08F /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -149,9 +192,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2B6A6EEE1FAFBDF8002D4003 /* Build configuration list for PBXNativeTarget "ios-StormCloudTests" */;
 			buildPhases = (
+				CF503A0681F2AF207296A295 /* [CP] Check Pods Manifest.lock */,
 				2B6A6ED31FAFBDF8002D4003 /* Sources */,
 				2B6A6ED41FAFBDF8002D4003 /* Frameworks */,
 				2B6A6ED51FAFBDF8002D4003 /* Resources */,
+				349A148B3624410E20CD4173 /* [CP] Embed Pods Frameworks */,
+				BB4271221DB47750DDB10E80 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -167,9 +213,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2B6A6EF11FAFBDF8002D4003 /* Build configuration list for PBXNativeTarget "ios-StormCloudUITests" */;
 			buildPhases = (
+				E34DDD19A10C4E352183CB10 /* [CP] Check Pods Manifest.lock */,
 				2B6A6EDE1FAFBDF8002D4003 /* Sources */,
 				2B6A6EDF1FAFBDF8002D4003 /* Frameworks */,
 				2B6A6EE01FAFBDF8002D4003 /* Resources */,
+				45A843E5A5F69BB8F0A29B98 /* [CP] Embed Pods Frameworks */,
+				3329552D7F4CEC40A151DF34 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -253,6 +302,163 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		3329552D7F4CEC40A151DF34 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ios-StormCloudUITests/Pods-ios-StormCloudUITests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		349A148B3624410E20CD4173 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ios-StormCloudTests/Pods-ios-StormCloudTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		45A843E5A5F69BB8F0A29B98 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ios-StormCloudUITests/Pods-ios-StormCloudUITests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		89A68BFEE8C7E029574C6CB1 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-ios-StormCloud/Pods-ios-StormCloud-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/GTMOAuth2/GTMOAuth2.framework",
+				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMOAuth2.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ios-StormCloud/Pods-ios-StormCloud-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		BB4271221DB47750DDB10E80 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ios-StormCloudTests/Pods-ios-StormCloudTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C79C307C30A956DC5AD7C73B /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-ios-StormCloud-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CF503A0681F2AF207296A295 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-ios-StormCloudTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E34DDD19A10C4E352183CB10 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-ios-StormCloudUITests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F38B307CAF44710FA902D08F /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-ios-StormCloud/Pods-ios-StormCloud-resources.sh",
+				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ios-StormCloud/Pods-ios-StormCloud-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		2B6A6EBF1FAFBDF7002D4003 /* Sources */ = {
@@ -424,6 +630,7 @@
 		};
 		2B6A6EEC1FAFBDF8002D4003 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6AF997C2080D737F0F168EC8 /* Pods-ios-StormCloud.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -439,6 +646,7 @@
 		};
 		2B6A6EED1FAFBDF8002D4003 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 731AAFEE2650629CD8071615 /* Pods-ios-StormCloud.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -454,6 +662,7 @@
 		};
 		2B6A6EEF1FAFBDF8002D4003 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 28C20A3EDD686EB4DF76D88E /* Pods-ios-StormCloudTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -471,6 +680,7 @@
 		};
 		2B6A6EF01FAFBDF8002D4003 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9C5260EB6204AB2A0B2FF8E1 /* Pods-ios-StormCloudTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -488,6 +698,7 @@
 		};
 		2B6A6EF21FAFBDF8002D4003 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 07E8EC847031D667B184EA3C /* Pods-ios-StormCloudUITests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -504,6 +715,7 @@
 		};
 		2B6A6EF31FAFBDF8002D4003 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1C104AD5E57CD835835EDD2D /* Pods-ios-StormCloudUITests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
