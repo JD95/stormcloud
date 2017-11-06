@@ -16,7 +16,6 @@ import qualified Database.Persist as P
 import           Database.Persist hiding (get)
 import           Database.Persist.Postgresql hiding (get)
 import           GHC.Generics
-import           Lucid
 import           Network.Wai.Handler.Warp
 import           Network.Wai.Handler.WarpTLS
 import           Network.Wai.Middleware.Cors
@@ -36,7 +35,6 @@ import           DatabaseActions
 import           DatabaseTypes
 import           DefaultResponses
 import           Login
-import           Page.Index
 import           Prefill
 import           ServerTypes
 import           Utilities
@@ -102,9 +100,6 @@ app config nameOfAppJs secret = do
   middleware (staticPolicy (addBase "static"))
 
   prehook initHook $ do
-    -- Application starting point
-    get root (index nameOfAppJs)
-
     -- User login
     get ("login" <//> var)  (login secret)
     
