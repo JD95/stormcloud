@@ -9,8 +9,6 @@ module Config
   ( Environment(..)
   , Config(..)
   , DbConnStr
-  , AppJs
-  , StripeSecret
   , loadConfig
   ) where
 
@@ -19,6 +17,8 @@ import           GHC.Generics
 import qualified Prelude      as P
 import           Protolude
 import Options.Applicative
+
+import Action.HandShake
 
 data Environment = Testing | Production
 
@@ -32,32 +32,16 @@ instance StringConv DbConnStr Text where
 instance P.Show DbConnStr where
   show (DbConnStr s) = P.show s
 
-newtype AppJs =
-  AppJs Text
-  deriving (Generic, ToJSON, FromJSON)
-
-instance StringConv AppJs Text where
-  strConv l (AppJs t) = t
-
-instance P.Show AppJs where
-  show (AppJs s) = P.show s
-
-newtype StripeSecret =
-  StripeSecret Text
-  deriving (Generic, ToJSON, FromJSON)
-
-instance StringConv StripeSecret Text where
-  strConv l (StripeSecret t) = t
-
-instance P.Show StripeSecret where
-  show (StripeSecret s) = P.show s
-
 data Config = Config
   { dbConnStr :: DbConnStr
-  , appJs :: AppJs
-  , stripeSecret :: StripeSecret
   , prefillStr :: Text
+  , ip :: FileServerIp
+  , port :: FileServerPort
   } deriving (Show, Generic, ToJSON, FromJSON)
+
+instance FileServerConfig Config where
+  fileServerIp = ip
+  fileServerPort = port
 
 newtype Options = Options Text
 

@@ -22,6 +22,7 @@ library
                      , DatabaseActions
                      , DatabaseTypes
                      , DefaultResponses
+                     , Action.HandShake
                      , Login
                      , Page.Index
                      , Prefill
@@ -45,12 +46,13 @@ library
                      , microlens-platform
                      , monad-logger
                      , mtl
+                     , network-simple
                      , optparse-applicative
                      , persistent
                      , persistent-postgresql
                      , persistent-template
-                     , protolude
                      , process
+                     , protolude
                      , random
                      , text
                      , time
@@ -61,6 +63,8 @@ library
                      , warp
                      , warp-tls
                      , wreq
+                     , saltine
+                     , monad-loops
   default-language:    Haskell2010
 
 Executable server-exe
