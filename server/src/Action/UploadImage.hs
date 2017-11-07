@@ -12,7 +12,6 @@ import           Data.ByteString.Char8 (lines, unlines, writeFile)
 import           Data.HVect
 import           Prelude (init)
 import           Protolude hiding (writeFile)
-import           System.Directory (createDirectoryIfMissing)
 import           Web.Spock
 
 import           Database.Persist
@@ -25,9 +24,7 @@ import           Utilities
 uploadimage :: ListContains n (Entity User) xs => ApiAction (HVect xs) ()
 uploadimage = do
   request <- unlines . init . drop 4 . lines <$> body
-  let name = toS . encode $ MD5.hash request
-  let folder = (<>) "images/" . intersperse '/' . take 6 $ name
-  let path = folder <> "/" <> name <> ".jpg"
-  liftIO $ createDirectoryIfMissing True ("static/" <> folder)
-  liftIO $ writeFile ("static/" <> path) request
-  text . toS $ path
+  -- contact ThatGuy
+  -- Send request
+  -- Respond to user with result
+  undefined

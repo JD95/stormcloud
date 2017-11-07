@@ -48,7 +48,7 @@ launchServer config = do
   pool <- runStdoutLoggingT $ createPostgresqlPool (toS conn) 5  
   spockCfg <- defaultSpockCfg Nothing (PCPool pool) ()
 
-  runStdoutLoggingT $ (flip runSqlPool pool) $ do
+  runStdoutLoggingT $ (`runSqlPool` pool) $ do
     runMigration migrateAll
     loadTestData
 
@@ -57,7 +57,7 @@ launchServer config = do
   secret <- getRandomBytes 16 :: IO ByteString
 
   -- Initialize the application
-  let middle = spock spockCfg (app config (toS . appJs $ config) . ServerSecret $ secret)
+  let middle = spock spockCfg (app config . ServerSecret $ secret)
   httpServer middle
 
 httpServer = runSpock 4000
@@ -90,23 +90,18 @@ withUser :: ListContains n (Entity User) xs
          -> (a -> ApiAction (HVect xs) b)   -- ^ Api action using part of entity
          -> ApiAction (HVect xs) b
 withUser from f = do
-  user <- liftM findFirst getContext  
+  user <- fmap findFirst getContext  
   f (from user)
 
 -- | The routing for the application
-app :: Config -> Text -> ServerSecret -> API ()
-app config nameOfAppJs secret = do
-
-  middleware (staticPolicy (addBase "static"))
-
+app :: Config -> ServerSecret -> API ()
+app config secret = 
   prehook initHook $ do
+    get "hello" (text "hello!")
     -- User login
     get ("login" <//> var)  (login secret)
     
     prehook authHook $ do
-
-      -- Requests
-      -- Actions
       post "logout" logout      
       post "upload-image" uploadimage      
 
