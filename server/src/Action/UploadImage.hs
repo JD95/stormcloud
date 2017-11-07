@@ -3,23 +3,25 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Action.UploadImage(uploadimage) where
+module Action.UploadImage
+  ( uploadimage
+  ) where
 
 import qualified Crypto.Hash.MD5 as MD5
-import           Data.Aeson hiding (encode)
-import           Data.ByteString.Base16 (encode)
-import           Data.ByteString.Char8 (lines, unlines, writeFile)
-import           Data.HVect
-import           Prelude (init)
-import           Protolude hiding (writeFile)
-import           Web.Spock
+import Data.Aeson hiding (encode)
+import Data.ByteString.Base16 (encode)
+import Data.ByteString.Char8 (lines, unlines, writeFile)
+import Data.HVect
+import Prelude (init)
+import Protolude hiding (writeFile)
+import Web.Spock
 
-import           Database.Persist
-import           DatabaseTypes
-import           DefaultResponses
-import           ServerTypes
-import           Types
-import           Utilities
+import Database.Persist
+import DatabaseTypes
+import DefaultResponses
+import ServerTypes
+import Types
+import Utilities
 
 uploadimage :: ListContains n (Entity User) xs => ApiAction (HVect xs) ()
 uploadimage = do

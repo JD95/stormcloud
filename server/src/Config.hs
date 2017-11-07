@@ -2,7 +2,7 @@
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric  #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Config
@@ -12,15 +12,17 @@ module Config
   , loadConfig
   ) where
 
-import           Data.Aeson
-import           GHC.Generics
-import qualified Prelude      as P
-import           Protolude
+import Data.Aeson
+import GHC.Generics
 import Options.Applicative
+import qualified Prelude as P
+import Protolude
 
 import Action.HandShake
 
-data Environment = Testing | Production
+data Environment
+  = Testing
+  | Production
 
 newtype DbConnStr =
   DbConnStr Text
@@ -43,25 +45,24 @@ instance FileServerConfig Config where
   fileServerIp = ip
   fileServerPort = port
 
-newtype Options = Options Text
+newtype Options =
+  Options Text
 
 opts :: Text -> Parser Options
-opts  defaultConfig =
-  Options <$> option auto
-    ( long "config"
-   <> short 'c'
-   <> metavar "CONFIG"
-   <> help "The location of the server configuration"
-   <> showDefault
-   <> value defaultConfig
-     )
+opts defaultConfig =
+  Options <$>
+  option
+    auto
+    (long "config" <> short 'c' <> metavar "CONFIG" <>
+     help "The location of the server configuration" <>
+     showDefault <>
+     value defaultConfig)
 
 optsInfo :: Text -> ParserInfo Options
-optsInfo defaultConfig = info (opts defaultConfig <**> helper)
-  ( fullDesc
-  <> progDesc "Launch the server"
-  <> header "Raffle Assistant"
-  )
+optsInfo defaultConfig =
+  info
+    (opts defaultConfig <**> helper)
+    (fullDesc <> progDesc "Launch the server" <> header "Raffle Assistant")
 
 loadConfig e = do
   let filePath =
