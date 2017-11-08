@@ -24,7 +24,6 @@ library
                      , DefaultResponses
                      , Action.HandShake
                      , Login
-                     , Page.Index
                      , Prefill
                      , ServerTypes
                      , Types
@@ -41,7 +40,6 @@ library
                      , directory
                      , hvect
                      , lens-aeson
-                     , lucid
                      , memory
                      , microlens-platform
                      , monad-logger
