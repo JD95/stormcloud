@@ -10,12 +10,15 @@ module Action.HandShake
 import           Crypto.Saltine.Core.Box
 import           Data.Aeson
 import qualified Data.ByteString as B
+import Data.ByteString (ByteString)
 import           Data.List
 import           Data.Monoid
 import           GHC.Generics
 import           GHC.Natural
 import           Network.Simple.TCP
 import Control.Monad.Loops
+
+import Action.Keys
 
 newtype FileServerIp
   = Ip String
@@ -28,6 +31,9 @@ newtype FileServerPort
 class FileServerConfig a where
   fileServerIp :: a -> FileServerIp
   fileServerPort :: a -> FileServerPort
+ 
+readServerKeys :: KeyRing a => B.ByteString -> B.ByteString -> B.ByteString -> Maybe a
+readServerKeys = undefined
 
 data FileServerMessage
   = Msg
@@ -52,7 +58,8 @@ recieveResponse s = do
                  then pure b
                  else fmap (b <>) (recieveResponse s) 
 
-handshake config = do
+handshake :: (KeyRing a , FileServerConfig b) => a -> b -> IO ()
+handshake keys config = do
   let (Ip ip) = fileServerIp config
   let (Port port) = fileServerPort config
   connect ip (show port) $ \(sock, addr) -> do
