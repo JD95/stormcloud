@@ -1,4 +1,6 @@
-{-# LANGUAGE DeriveGeneric, DeriveAnyClass, OverloadedStrings #-}
+{-# LANGUAGE DeriveAnyClass    #-}
+{-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Action.HandShake
   ( FileServerIp
@@ -7,26 +9,26 @@ module Action.HandShake
   , handshake
   ) where
 
-import Control.Monad.Loops
-import Crypto.Saltine.Class
-import Crypto.Saltine.Core.Box
-import Data.Aeson hiding (decode)
-import qualified Data.ByteString as B
-import Data.ByteString
-import qualified Data.ByteString.Char8 as BC
-import Data.List
-import Data.Monoid
-import GHC.Generics
-import GHC.Natural
-import Network.Simple.TCP
-import Text.Read
+import           Control.Monad.Loops
+import           Crypto.Saltine.Class
+import           Crypto.Saltine.Core.Box
+import           Data.Aeson              hiding (decode)
+import           Data.ByteString
+import qualified Data.ByteString         as B
+import qualified Data.ByteString.Char8   as BC
+import           Data.List
+import           Data.Monoid
+import           GHC.Generics
+import           GHC.Natural
+import           Network.Simple.TCP
+import           Text.Read
 
-import Action.FileServer
-import Action.Keys
+import           Action.FileServer
+import           Action.Keys
 
 data Test = Test
-  { testIp :: String
-  , testPort :: Natural
+  { testIp     :: String
+  , testPort   :: Natural
   , testPubKey :: PublicKey
   , testSecKey :: SecretKey
   }
