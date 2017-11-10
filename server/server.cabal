@@ -17,6 +17,8 @@ library
   hs-source-dirs:      src
   exposed-modules:     App
                      , Action.UploadImage
+                     , Action.Keys
+                     , Action.FileServer
                      , Authentication
                      , Config
                      , DatabaseActions

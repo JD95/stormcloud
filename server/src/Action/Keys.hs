@@ -1,23 +1,44 @@
-module Action.Keys where
+{-# LANGUAGE OverloadedStrings #-}
 
+module Action.Keys
+  ( CipherText
+  , PlainText(..)
+  , KeyRing(..)
+  , sendCipherText
+  , recvAndDecode
+  ) where
+
+import Control.Monad
+import Control.Monad.Loops
 import Crypto.Saltine.Core.Box
-import Data.ByteString
+import qualified Data.ByteString as B
+import Data.ByteString (ByteString)
+import Network.Simple.TCP
 
-newtype CipherText 
-  = CipherText ByteString
+-- | Wrapper that prevents CipherText from being used elsewhere
+newtype CipherText =
+  CipherText ByteString
 
-newtype PlainText
-  = Plaintext ByteString
+sendCipherText s (CipherText c) = send s c
+
+recvAndDecode :: KeyRing a => a -> Socket -> IO (Either String PlainText)
+recvAndDecode keyring s =
+  maybe (Left "Error Recieving Message") (readMessage) . sequence <$>
+  recieveMessage (recv s 2048)
+  where
+    readMessage = decrypt keyring . B.concat
+    recieveMessage = unfoldWhileM (maybe False (B.isSuffixOf "\r\n\r\n"))
+
+newtype PlainText =
+  Plaintext ByteString
+  deriving (Show)
 
 -- | A type which holds the data needed
 --   to communicate with the file server.
-class KeyRing a where
-  
+class KeyRing a
   -- | Attempt to verify and read a package sent from
   --   the file server.
-  readFromFileServer :: a -> CipherText -> Maybe PlainText 
-
+                        where
+  decrypt :: a -> ByteString -> Either String PlainText
   -- | Encrypt and sign package from file server.
-  writeForFileServer :: a -> PlainText -> CipherText 
-
-
+  encrypt :: a -> PlainText -> CipherText
