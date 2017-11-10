@@ -11,7 +11,7 @@ import Text.Read
 import Data.Tuple
 
 newtype Parser a =
-  Parser ([ByteString] -> Either String ([ByteString], a))
+  Parser { runParser :: [ByteString] -> Either String ([ByteString], a) }
   deriving (Functor)
 
 instance Applicative Parser where
@@ -21,6 +21,12 @@ instance Applicative Parser where
       let parseInput (rest, f) = either Left (Right . fmap f) (x' rest)
       in either Left parseInput (f' input)
 
+instance Monad Parser where
+  (Parser ma) >>= f = Parser $ \input ->
+    case ma input of
+      Right (rest, a) -> runParser (f a) rest
+      Left e -> Left e
+      
 digit = "0123456789"
 
 readByteString :: Read a => ByteString -> Either String a
