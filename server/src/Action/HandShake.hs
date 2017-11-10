@@ -46,10 +46,6 @@ instance FileServerConfig Test where
   fileServerIp = Ip . testIp
   fileServerPort = Port . testPort
 
-recieveResponse s =
-  fmap B.concat . sequence <$>
-  (unfoldWhileM (maybe False (B.isSuffixOf "\r\n\r\n")) (recv s 2048))
-
 handshake :: (KeyRing a, FileServerConfig a) => a -> IO ()
 handshake config =
   connectWithFileServer config $ \(sock, addr) -> do
