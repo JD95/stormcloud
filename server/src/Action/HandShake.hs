@@ -17,9 +17,11 @@ import GHC.Generics
 import GHC.Natural
 import Network.Simple.TCP
 
-newtype FileServerIp =
-  Ip String
-  deriving (Show, Generic, ToJSON, FromJSON)
+import Action.Keys
+
+newtype FileServerIp
+  = Ip String
+    deriving (Show, Generic, ToJSON, FromJSON)
 
 newtype FileServerPort =
   Port Natural
@@ -28,6 +30,9 @@ newtype FileServerPort =
 class FileServerConfig a where
   fileServerIp :: a -> FileServerIp
   fileServerPort :: a -> FileServerPort
+ 
+readServerKeys :: KeyRing a => B.ByteString -> B.ByteString -> B.ByteString -> Maybe a
+readServerKeys = undefined
 
 data FileServerMessage = Msg
   { requestType :: B.ByteString
@@ -49,7 +54,8 @@ recieveResponse s =
   fmap B.concat . sequence <$>
   (unfoldWhileM (maybe False (B.isSuffixOf "\r\n\r\n")) (recv s 2048))
 
-handshake config = do
+handshake :: (KeyRing a , FileServerConfig b) => a -> b -> IO ()
+handshake keys config = do
   let (Ip ip) = fileServerIp config
   let (Port port) = fileServerPort config
   connect ip (show port) $ \(sock, addr) -> do
