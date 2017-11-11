@@ -1,0 +1,16 @@
+version: "1"
+services:
+  web:
+    image: stormcloud-server
+    deploy:
+      resources:
+        limits:
+	  cpus: "0.1"
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "4000:80"
+    networks:
+      - webnet
+networks:
+  webnet:

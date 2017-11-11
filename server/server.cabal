@@ -17,13 +17,15 @@ library
   hs-source-dirs:      src
   exposed-modules:     App
                      , Action.UploadImage
+                     , Action.Keys
+                     , Action.FileServer
                      , Authentication
                      , Config
                      , DatabaseActions
                      , DatabaseTypes
                      , DefaultResponses
+                     , Action.HandShake
                      , Login
-                     , Page.Index
                      , Prefill
                      , ServerTypes
                      , Types
@@ -40,17 +42,17 @@ library
                      , directory
                      , hvect
                      , lens-aeson
-                     , lucid
                      , memory
                      , microlens-platform
                      , monad-logger
                      , mtl
+                     , network-simple
                      , optparse-applicative
                      , persistent
                      , persistent-postgresql
                      , persistent-template
-                     , protolude
                      , process
+                     , protolude
                      , random
                      , text
                      , time
@@ -61,6 +63,8 @@ library
                      , warp
                      , warp-tls
                      , wreq
+                     , saltine
+                     , monad-loops
   default-language:    Haskell2010
 
 Executable server-exe
