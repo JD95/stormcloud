@@ -5,7 +5,6 @@ module Action.Keys
   , PlainText(..)
   , KeyRing(..)
   , sendCipherText
-  , recvAndDecode
   ) where
 
 import Control.Monad

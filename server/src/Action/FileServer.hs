@@ -6,7 +6,6 @@ module Action.FileServer
   , FileServerConfig(..)
   , FileServerMessage(..)
   , connectWithFileServer
-  , packageMessage
   ) where
 
 import Data.Aeson
@@ -40,10 +39,10 @@ data FileServerMessage = Msg
   , payload :: B.ByteString
   }
 
-packageMessage :: KeyRing a => a -> FileServerMessage -> CipherText
-packageMessage keyring (Msg r p) =
-  encrypt keyring . Plaintext . foldr1 (<>) . intersperse "\r\n" $
-  [r, p, "\r\n"]
+-- packageMessage :: KeyRing a => a -> FileServerMessage -> CipherText
+-- packageMessage keyring (Msg r p) =
+--   encrypt keyring . Plaintext . foldr1 (<>) . intersperse "\r\n" $
+--   [r, p, "\r\n"]
 
 connectWithFileServer :: FileServerConfig a => a -> ((Socket, SockAddr) -> IO ()) -> IO ()
 connectWithFileServer config f = do

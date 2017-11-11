@@ -97,9 +97,11 @@ withUser from f = do
 app :: Config -> ServerSecret -> API ()
 app config secret =
   prehook initHook $ do
-    get "hello" (text "hello!")
+    get "hello" $ do
+      liftIO $ print "Hello!"
+      (text "hello!")
     -- User login
-    get ("login" <//> var) (login secret)
+    get ("login" <//> var) $ (login secret)
     prehook authHook $ do
       post "logout" logout
       post "upload-image" uploadimage

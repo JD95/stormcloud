@@ -9,6 +9,9 @@ import qualified Data.ByteString.Char8 as BC
 import Data.List
 import Text.Read
 import Data.Tuple
+import Control.Monad.Loops
+import Control.Applicative
+import GHC.Natural
 
 newtype Parser a =
   Parser { runParser :: [ByteString] -> Either String ([ByteString], a) }
@@ -18,8 +21,13 @@ instance Applicative Parser where
   pure a = Parser $ \input -> Right (input, a)
   Parser f' <*> Parser x' =
     Parser $ \input ->
-      let parseInput (rest, f) = either Left (Right . fmap f) (x' rest)
+      let parseInput (rest, f) = fmap (fmap f) (x' rest)
       in either Left parseInput (f' input)
+
+instance Alternative Parser where
+  empty = Parser (const $ Left "")
+  f <|> g = Parser $ \input ->
+    either (const $ runParser g input) Right (runParser f input) 
 
 instance Monad Parser where
   (Parser ma) >>= f = Parser $ \input ->
@@ -32,7 +40,7 @@ digit = "0123456789"
 readByteString :: Read a => ByteString -> Either String a
 readByteString = readEither . BC.unpack
 
-parseInt :: [ByteString] -> Either String ([ByteString], Int)
+parseInt :: [ByteString] -> Either String ([ByteString], Natural)
 parseInt (input:more) = fmap ((,) more) . readByteString $ input
 
 parseSymbol ::
@@ -44,7 +52,7 @@ parseSymbol target (input:rest) =
 
 parseString :: [ByteString] -> Either String ([ByteString], ByteString)
 parseString ("\"":rest) =
-  case span ((/=) "\"") rest of
+  case span ("\"" /=) rest of
     (_, []) -> Left "Unbalanced double quotes"
     (inner, "\"":more) -> Right (more, B.concat . intersperse " " $ inner)
 parseString _ = Left "Could not parse opening string quote"
@@ -58,6 +66,22 @@ quote = Parser (parseSymbol "\"")
 colon = Parser (parseSymbol ":")
 
 comma = Parser (parseSymbol ",")
+
+openBracket = Parser (parseSymbol "[")
+closeBracket = Parser (parseSymbol "]")
+
+openCurly = Parser (parseSymbol "{")
+closedCurly = Parser (parseSymbol "}")
+
+symbol s = Parser (parseSymbol s)
+
+parseUntil :: Parser many -> Parser end -> Parser [many]
+parseUntil m e = Parser $ \input ->
+  either (const $ runParser ((:) <$> m <*> parseUntil m e) input) (Right . fmap (const [])) (runParser e input)
+
+between :: Parser start -> Parser end -> Parser a -> Parser [a]
+between st end middle =
+  st *> parseUntil middle end
 
 seperators :: ByteString
 seperators = ":,[]{}\""
