@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2B0E8E191FB57EB7001FBC25 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2B0E8E181FB57EB7001FBC25 /* GoogleService-Info.plist */; };
 		2B6A6EC71FAFBDF7002D4003 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B6A6EC61FAFBDF7002D4003 /* AppDelegate.swift */; };
 		2B6A6EC91FAFBDF7002D4003 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B6A6EC81FAFBDF7002D4003 /* ViewController.swift */; };
 		2B6A6ECC1FAFBDF7002D4003 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2B6A6ECA1FAFBDF7002D4003 /* Main.storyboard */; };
@@ -40,6 +41,7 @@
 		07E8EC847031D667B184EA3C /* Pods-ios-StormCloudUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios-StormCloudUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ios-StormCloudUITests/Pods-ios-StormCloudUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		1C104AD5E57CD835835EDD2D /* Pods-ios-StormCloudUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios-StormCloudUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-ios-StormCloudUITests/Pods-ios-StormCloudUITests.release.xcconfig"; sourceTree = "<group>"; };
 		28C20A3EDD686EB4DF76D88E /* Pods-ios-StormCloudTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios-StormCloudTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ios-StormCloudTests/Pods-ios-StormCloudTests.debug.xcconfig"; sourceTree = "<group>"; };
+		2B0E8E181FB57EB7001FBC25 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = SOURCE_ROOT; };
 		2B6A6EC31FAFBDF7002D4003 /* ios-StormCloud.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ios-StormCloud.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B6A6EC61FAFBDF7002D4003 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2B6A6EC81FAFBDF7002D4003 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -114,6 +116,7 @@
 		2B6A6EC51FAFBDF7002D4003 /* ios-StormCloud */ = {
 			isa = PBXGroup;
 			children = (
+				2B0E8E181FB57EB7001FBC25 /* GoogleService-Info.plist */,
 				2B6A6EC61FAFBDF7002D4003 /* AppDelegate.swift */,
 				2B6A6EC81FAFBDF7002D4003 /* ViewController.swift */,
 				2B6A6ECA1FAFBDF7002D4003 /* Main.storyboard */,
@@ -282,6 +285,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2B6A6ED11FAFBDF7002D4003 /* LaunchScreen.storyboard in Resources */,
+				2B0E8E191FB57EB7001FBC25 /* GoogleService-Info.plist in Resources */,
 				2B6A6ECE1FAFBDF7002D4003 /* Assets.xcassets in Resources */,
 				2B6A6ECC1FAFBDF7002D4003 /* Main.storyboard in Resources */,
 			);
