@@ -52,7 +52,8 @@ genToken (ServerSecret s) = do
   time <- liftIO $ fmap (diffTimeToPicoseconds . utctDayTime) getCurrentTime
   let sessionId = do
         userAgent <- lookup "User-Agent" headers
-        referer <- lookup "Referer" headers
+        let referer = ""
+        --referer <- lookup "Referer" headers
         pure . B.concat $ [num, show time, userAgent, referer, s]
   for sessionId $ \sid -> pure (decodeUtf8 . encode . hash $ sid)
 
@@ -62,6 +63,7 @@ genSession ::
   -> ApiAction LoggedOut (Maybe ((Key User, User), Session))
 genSession idToken s = do
   t <- verify idToken
+  print t
   c' <- genToken s
   expr <- liftIO $ addUTCTime sessionLength <$> getCurrentTime
   fmap join . for c' $ \c ->
@@ -85,6 +87,7 @@ genSession idToken s = do
 login :: ServerSecret -> Text -> ApiAction LoggedOut ()
 login serverSecret idToken = do
   session <- genSession idToken serverSecret
+  liftIO $ print session
   liftIO $ print "Login Attempt"
   case session of
     Nothing -> errorJson 2 "Login Failed"

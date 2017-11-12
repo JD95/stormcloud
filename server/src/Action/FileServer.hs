@@ -37,7 +37,7 @@ readServerKeys = undefined
 data FileServerMessage = Msg
   { fsHeader :: B.ByteString
   , fsPayload :: B.ByteString
-  } deriving (Eq)
+  } deriving (Show, Eq)
 
 instance Message FileServerMessage where
   header = fsHeader 

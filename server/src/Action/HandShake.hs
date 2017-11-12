@@ -58,15 +58,23 @@ instance FileServerConfig Test where
   fileServerIp = Ip . testIp
   fileServerPort = Port . testPort
 
+testResponse = "test\r\nE2AC2AE0A09AB908BE316433908728F385075B62E563D787A0538C7CC60C19234ACF98433C178984A4B65C15804AFF96\r\n\r\n"
+
+testPayload = "E2AC2AE0A09AB908BE316433908728F385075B62E563D787A0538C7CC60C19234ACF98433C178984A4B65C15804AFF96" 
+
 test = do
   n <- newNonce
   config <- readTestConfig
-  flip (either print) config $ \(_, t) ->
-    connectWithFileServer t $ \(sock, addr) -> do
-      sendMessage t (toPlainText $ Msg "hello" "test") sock
-      response <- recvMessage @Test @FileServerMessage t sock
-      flip (either print) response $ \p ->
-        if p == (toPlainText $ Msg "random" "swifty")
-          then print "Success!"
-          else print "Failure!"
+  flip (either print) config $ \(_, t) -> do
+    -- print $ decrypt t $ fromBase16 $ Base16 testPayload
+    -- print $ decryptMessage t (CipherText $ Msg "test" testPayload)
+    -- print $ decryptMessage @Test @FileServerMessage t =<< parseHeaderAndPayload testResponse
+   -- print $ decrypt t =<< parseHeaderAndPayload testResponse
+  connectWithFileServer t $ \(sock, addr) -> do
+    sendMessage t (toPlainText $ Msg "hello" "test") sock
+    response <- recvMessage @Test @FileServerMessage t sock
+    flip (either print) response $ \p ->
+      if p == (toPlainText $ Msg "random" "swifty")
+        then print "Success!"
+        else print "Failure!"
 

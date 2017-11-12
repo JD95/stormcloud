@@ -103,5 +103,6 @@ app config secret =
     -- User login
     get ("login" <//> var) $ (login secret)
     prehook authHook $ do
+      get "happy" $ text "Congrats you're in the cool club"
       post "logout" logout
       post "upload-image" uploadimage
