@@ -85,6 +85,7 @@ genSession idToken s = do
 login :: ServerSecret -> Text -> ApiAction LoggedOut ()
 login serverSecret idToken = do
   session <- genSession idToken serverSecret
+  liftIO $ print "Login Attempt"
   case session of
     Nothing -> errorJson 2 "Login Failed"
     Just (userInfo, sess@(Session t e u)) -> do

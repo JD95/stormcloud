@@ -1,69 +1,72 @@
-{-# LANGUAGE DeriveGeneric, DeriveAnyClass, OverloadedStrings #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Action.HandShake
   ( FileServerIp
   , FileServerPort
   , FileServerConfig(..)
-  , handshake
   ) where
 
 import Control.Monad.Loops
-import Crypto.Saltine.Core.Box
-import Data.Aeson
+import Crypto.Saltine.Class
+import Crypto.Saltine.Core.SecretBox
+import Crypto.Saltine.Internal.ByteSizes
+import Data.Aeson hiding (decode, encode)
+import Data.ByteString
 import qualified Data.ByteString as B
+import qualified Data.ByteString.Base16 as B16
+import qualified Data.ByteString.Char8 as BC
+import Data.Char
 import Data.List
+import Data.Maybe
 import Data.Monoid
 import GHC.Generics
 import GHC.Natural
 import Network.Simple.TCP
+import Text.Read
 
-import Action.Keys
+import Action.FileServer
+import Action.Parser
+import Action.Encryption
 
-newtype FileServerIp
-  = Ip String
-    deriving (Show, Generic, ToJSON, FromJSON)
-
-newtype FileServerPort =
-  Port Natural
-  deriving (Show, Generic, ToJSON, FromJSON)
-
-class FileServerConfig a where
-  fileServerIp :: a -> FileServerIp
-  fileServerPort :: a -> FileServerPort
- 
-readServerKeys :: KeyRing a => B.ByteString -> B.ByteString -> B.ByteString -> Maybe a
-readServerKeys = undefined
-
-data FileServerMessage = Msg
-  { requestType :: B.ByteString
-  , payload :: B.ByteString
+data Test = Test
+  { testIp :: String
+  , testPort :: Natural
+  , secretKey :: Key
   }
 
-toByteString :: FileServerMessage -> B.ByteString
-toByteString (Msg r p) = foldr1 (<>) . intersperse "\r\n" $ [r, p, "\r\n"]
+objectValue name value =
+  quote *> symbol name *> quote *> colon *> value <* comma
 
-data Test =
-  Test String
-       Natural
+parseTest :: Parser Test
+parseTest = openCurly *> content <* closedCurly
+  where
+    content =
+      Test <$> (BC.unpack <$> objectValue "testIp" string) <*>
+      objectValue "testPort" int <*>
+      (fmap (fromJust . decodeBase16Key) $ objectValue "secretKey" string)
+
+readTestConfig :: IO (Either String ([ByteString], Test))
+readTestConfig = parse parseTest <$> B.readFile "test-config.json"
+
+instance KeyRing Test where
+  key = secretKey
 
 instance FileServerConfig Test where
-  fileServerIp (Test r _) = Ip r
-  fileServerPort (Test _ p) = Port p
+  fileServerIp = Ip . testIp
+  fileServerPort = Port . testPort
 
-recieveResponse s =
-  fmap B.concat . sequence <$>
-  (unfoldWhileM (maybe False (B.isSuffixOf "\r\n\r\n")) (recv s 2048))
+test = do
+  n <- newNonce
+  config <- readTestConfig
+  flip (either print) config $ \(_, t) ->
+    connectWithFileServer t $ \(sock, addr) -> do
+      sendMessage t (toPlainText $ Msg "hello" "test") sock
+      response <- recvMessage @Test @FileServerMessage t sock
+      flip (either print) response $ \p ->
+        if p == (toPlainText $ Msg "random" "swifty")
+          then print "Success!"
+          else print "Failure!"
 
-handshake :: (KeyRing a , FileServerConfig b) => a -> b -> IO ()
-handshake keys config = do
-  let (Ip ip) = fileServerIp config
-  let (Port port) = fileServerPort config
-  connect ip (show port) $ \(sock, addr) -> do
-    let msg1 = Msg "upload" "hello"
-    let msg2 = Msg "download" "stuff"
-    send sock (toByteString msg1)
-    response <- recieveResponse sock
-    print response
-    send sock (toByteString msg2)
-    response2 <- recieveResponse sock
-    print response2
