@@ -28,7 +28,7 @@ import Network.Simple.TCP
 import Text.Read
 
 import Action.FileServer
-import Action.JsonParse
+import Action.Parser
 import Action.Encryption
 
 data Test = Test

@@ -19,6 +19,7 @@ library
                      , Action.UploadImage
                      , Action.Encryption
                      , Action.FileServer
+                     , Action.Parser
                      , Authentication
                      , Config
                      , DatabaseActions
