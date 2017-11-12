@@ -35,14 +35,14 @@ readServerKeys ::
 readServerKeys = undefined
 
 data FileServerMessage = Msg
-  { requestType :: B.ByteString
-  , payload :: B.ByteString
-  }
+  { fsHeader :: B.ByteString
+  , fsPayload :: B.ByteString
+  } deriving (Eq)
 
--- packageMessage :: KeyRing a => a -> FileServerMessage -> CipherText
--- packageMessage keyring (Msg r p) =
---   encrypt keyring . Plaintext . foldr1 (<>) . intersperse "\r\n" $
---   [r, p, "\r\n"]
+instance Message FileServerMessage where
+  header = fsHeader 
+  payload = fsPayload
+  buildMessage = Msg 
 
 connectWithFileServer :: FileServerConfig a => a -> ((Socket, SockAddr) -> IO ()) -> IO ()
 connectWithFileServer config f = do
