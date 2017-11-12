@@ -16,7 +16,7 @@ import GHC.Generics
 import GHC.Natural
 import Network.Simple.TCP
 
-import Action.Keys
+import Action.Encryption
 
 newtype FileServerIp =
   Ip String

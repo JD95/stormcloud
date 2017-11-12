@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Action.Keys
+module Action.Encryption
   ( KeyRing(..)
   , Message(..)
   , Base16
