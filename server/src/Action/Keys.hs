@@ -58,16 +58,18 @@ class KeyRing a where
 
 -- | Encrypts plaintext using a randomly generated nonce.
 -- Returns the encrypted message prefixed with the nonce used.
-encrypt t b = do
+encrypt :: KeyRing k => k -> ByteString -> IO ByteString
+encrypt k b = do
   n <- newNonce
-  let cipher = secretbox (key t) n b
+  let cipher = secretbox (key k) n b
   pure (encode n <> cipher)
 
 -- | Decrypts message enocded in base16, prefixed with a nonce.
-decrypt t b =
+decrypt :: KeyRing k => k -> ByteString -> Either String ByteString
+decrypt k b =
   case decode (fromBase16 (Base16 n)) :: Maybe Nonce of
     Just nonce ->
-      maybe (Left "Could not open box!") Right $ secretboxOpen (key t) nonce m
+      maybe (Left "Could not open box!") Right $ secretboxOpen (key k) nonce m
     Nothing -> Left "Could not decode nonce!"
   where
     (n, m') = B.splitAt (secretBoxNonce) b
