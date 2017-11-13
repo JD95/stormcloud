@@ -36,7 +36,9 @@ def listen():
 				current_connection.send(encrypted)
 
 			if True:
-				print(data)
+				print("message: " + repr(data) + "\nend of message")
+				data = data.split("\r\n")[1]
+				print("parsed", data)
 				data = base64.b16decode(data) 
 				print(repr(data))
 				#message = data.split("hello")
@@ -44,16 +46,16 @@ def listen():
 				text = box.decrypt(data)
 				print(text)
 				
-				message = b"SCHWIFTY"
+				message =  b"SCHWIFTY"
 				encrypted = box.encrypt(message)
 				print(encrypted)
 				encrypted = base64.b16encode(encrypted)
-				current_connection.send(encrypted+"\r\n\r\n")
+				current_connection.send(b"test\r\n" + encrypted + b"\r\n\r\n")
 				print("message sent")
 				break
 			
 
-
+			#packet format: text descriptor, \r\n, payload, \r\n\r\n
 			'''
 			if data == 'quit\r\n':
 				current_connection.shutdown(1)
