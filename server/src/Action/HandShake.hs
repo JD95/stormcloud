@@ -66,15 +66,11 @@ test = do
   n <- newNonce
   config <- readTestConfig
   flip (either print) config $ \(_, t) -> do
-    -- print $ decrypt t $ fromBase16 $ Base16 testPayload
-    -- print $ decryptMessage t (CipherText $ Msg "test" testPayload)
-    -- print $ decryptMessage @Test @FileServerMessage t =<< parseHeaderAndPayload testResponse
-   -- print $ decrypt t =<< parseHeaderAndPayload testResponse
   connectWithFileServer t $ \(sock, addr) -> do
     sendMessage t (toPlainText $ Msg "hello" "test") sock
     response <- recvMessage @Test @FileServerMessage t sock
     flip (either print) response $ \p ->
-      if p == (toPlainText $ Msg "random" "swifty")
+      if p == (toPlainText $ Msg "test" "SCHWIFTY")
         then print "Success!"
         else print "Failure!"
 
