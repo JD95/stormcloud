@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
@@ -33,20 +34,21 @@ import Network.Simple.TCP
 
 newtype Base16 a =
   Base16 a
+  deriving (Functor)
 
 class Base16Conv a where
   fromBase16 :: Base16 a -> a
   toBase16 :: a -> Base16 a
 
 instance (Monoid m) => Monoid (Base16 m) where
-  mempty = Base16 mempty 
+  mempty = Base16 mempty
   mappend (Base16 a) (Base16 b) = Base16 (a `mappend` b)
 
-instance Base16Conv ByteString where
+instance Base16Conv ByteString
   -- | A utility for reading encrypted messages.
   --  Converts text from uppercase base 16 encoding.
+                                                     where
   fromBase16 (Base16 b) = fst . B16.decode . BC.map toLower $ b
-  
   -- | A utility for creating encrypted messages.
   --  Converts text to uppercase base 16 encoding.
   toBase16 = Base16 . BC.map toUpper . B16.encode
@@ -54,10 +56,6 @@ instance Base16Conv ByteString where
 -- | A utility for decoding raw bytestrings as a "Key".
 decodeBase16Key :: ByteString -> Maybe Key
 decodeBase16Key = decode . fromBase16 . Base16
-
--- | Lifts a function on a "ByteString" into a function on "Base16".
-base16 :: (a -> a) -> (Base16 a -> Base16 a)
-base16 f (Base16 b) = Base16 (f b)
 
 -- | A type which holds the Secret Key
 class KeyRing a where
@@ -75,23 +73,26 @@ instance Encrypt ByteString
     n <- newNonce
     pure (toBase16 $ encode n <> secretbox (key k) n b)
   -- | Decrypts message enocded in base16, prefixed with a nonce.
-
-  decrypt k (Base16 b) =
+  decrypt k b =
     case decode n :: Maybe Nonce of
       Just nonce ->
         maybe (Left "Could not open box!") Right $ secretboxOpen (key k) nonce m
       Nothing -> Left "Could not decode nonce!"
     where
-      (n, m) = B.splitAt secretBoxNonce b
+      (n, m) = B.splitAt secretBoxNonce $ fromBase16 b
 
 -- | Uses a "Socket" to send a "Base16" string.
 sendBase16 sock (Base16 b) = send sock b
 
 -- | Represents a message with a header and payload.
-class Message m content where
-  header :: m content -> content
-  payload :: m content -> content
-  buildMessage :: conent -> content -> m content
+data Message content
+  = Message
+  { header :: B.ByteString
+  , payload :: content
+  } deriving (Functor)
+
+instance (Eq content) => Eq (Message content) where
+ (Message a b) == (Message c d) = a == c && b == d
 
 -- | Wraps content which is meant to be in plain text.
 -- Does not define a Show instance nor does it export its
@@ -112,30 +113,36 @@ newtype CipherText m =
 -- | Encrypts the payload of a "PlainText" message. Prefixes the payload with the nonce
 -- used to make it.
 encryptMessage ::
-     (Encrypt b, KeyRing k, Message m b, Message m (Base16 b)) => k -> PlainText (m b) -> IO (CipherText (m (Base16 b)))
+     (Encrypt b, KeyRing k)
+  => k
+  -> PlainText (Message b)
+  -> IO (CipherText (Message (Base16 b)))
 encryptMessage key (PlainText msg) =
-  CipherText . buildMessage (header msg) <$> encrypt key (payload msg)
+  CipherText . Message (header msg) <$> encrypt key (payload msg)
 
 -- | Decrypts the payload of a "CipherText" message. Expects the payload to be in base 16
 -- with the nonce used to create it at the front of the message.
 decryptMessage ::
-     (Encrypt b, KeyRing k, Message m b, Message m (Base16 b))
+     (Encrypt b, KeyRing k)
   => k
-  -> CipherText (m (Base16 b))
-  -> Either String (PlainText (m b))
+  -> CipherText (Message (Base16 b))
+  -> Either String (PlainText (Message b))
 decryptMessage key (CipherText msg) =
-  PlainText . buildMessage (header msg) <$>
-  decrypt key (payload msg)
+  PlainText . Message (header msg) <$> decrypt key (payload msg)
 
 -- | Encrypts a message using the key. Message is prefixed with the given header.
 -- they payload is prefixed with the nonce used to generate the message.
 -- The whole package is ended with \r\n\r\n.
 sendMessage ::
-     (KeyRing k, Message m ByteString) => k -> PlainText (m ByteString) -> Socket -> IO ()
+     (KeyRing k)
+  => k
+  -> PlainText (Message ByteString)
+  -> Socket
+  -> IO ()
 sendMessage key msg sock = do
   CipherText cipher <- encryptMessage key msg
   sendBase16 sock $
-    base16 (B.append (header cipher <> "\r\n") . (`B.append` "\r\n\r\n")) .
+    fmap (B.append (header cipher <> "\r\n") . (`B.append` "\r\n\r\n")) $
     payload cipher
 
 -- | Converts a predicate into a maybe result.
@@ -165,24 +172,24 @@ breakReturn b = Just (m, B.drop (B.length "\r\n") n)
 
 -- | Attempts to parse out the header and payload of an encrypted message.
 parseHeaderAndPayload ::
-     Message m ByteString
-  => ByteString
-  -> Either String (CipherText (m ByteString))
+  ByteString
+  -> Either String (CipherText (Message (Base16 ByteString)))
 parseHeaderAndPayload b
   | length sections /= 2 =
     Left "Could not parse header and content. Too many sections"
   | otherwise =
-    Right . CipherText $ buildMessage (head sections) (head . tail $ sections)
+    Right . CipherText $
+    Message (head sections) (Base16 . head . tail $ sections)
   where
     sections = unfoldr breakReturn b
 
 -- | Recieves a message with a header, encrypted payload prefixed by the nonce used to make it,
 -- and ended with \r\n\r\n.
 recvMessage ::
-     (KeyRing k, Message m ByteString)
+     (KeyRing k)
   => k
   -> Socket
-  -> IO (Either String (PlainText (m ByteString)))
+  -> IO (Either String (PlainText (Message ByteString)))
 recvMessage key s =
   (decryptMessage key <=< parseHeaderAndPayload) . B.concat <$>
   recvUntilEnd s 2048

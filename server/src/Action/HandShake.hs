@@ -67,10 +67,10 @@ test = do
   config <- readTestConfig
   flip (either print) config $ \(_, t) -> do
   connectWithFileServer t $ \(sock, addr) -> do
-    sendMessage t (toPlainText $ Msg "hello" "test") sock
-    response <- recvMessage @Test @FileServerMessage t sock
+    sendMessage t (toPlainText $ Message "hello" "test") sock
+    response <- recvMessage @Test t sock
     flip (either print) response $ \p ->
-      if p == (toPlainText $ Msg "test" "SCHWIFTY")
+      if p == (toPlainText $ Message "test" "SCHWIFTY")
         then print "Success!"
         else print "Failure!"
 

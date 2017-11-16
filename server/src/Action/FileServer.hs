@@ -1,10 +1,11 @@
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings, DeriveGeneric, DeriveAnyClass #-}
 
 module Action.FileServer
   ( FileServerIp(..)
   , FileServerPort(..)
   , FileServerConfig(..)
-  , FileServerMessage(..)
   , connectWithFileServer
   ) where
 
@@ -33,16 +34,6 @@ class FileServerConfig a where
 readServerKeys ::
      KeyRing a => B.ByteString -> B.ByteString -> B.ByteString -> Maybe a
 readServerKeys = undefined
-
-data FileServerMessage = Msg
-  { fsHeader :: B.ByteString
-  , fsPayload :: B.ByteString
-  } deriving (Show, Eq)
-
-instance Message FileServerMessage where
-  header = fsHeader 
-  payload = fsPayload
-  buildMessage = Msg 
 
 connectWithFileServer :: FileServerConfig a => a -> ((Socket, SockAddr) -> IO ()) -> IO ()
 connectWithFileServer config f = do
