@@ -1,23 +1,26 @@
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE DeriveAnyClass        #-}
+{-# LANGUAGE DeriveGeneric         #-}
+{-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE OverloadedStrings, DeriveGeneric, DeriveAnyClass #-}
+{-# LANGUAGE OverloadedStrings     #-}
 
 module Action.FileServer
   ( FileServerIp(..)
   , FileServerPort(..)
   , FileServerConfig(..)
-  , connectWithFileServer
+  , makeFileRequest
   ) where
 
-import Data.Aeson
-import qualified Data.ByteString as B
-import Data.List
-import Data.Monoid
-import GHC.Generics
-import GHC.Natural
-import Network.Simple.TCP
+import           Data.Aeson
+import           Data.ByteString    (ByteString)
+import qualified Data.ByteString    as B
+import           Data.List
+import           Data.Monoid
+import           GHC.Generics
+import           GHC.Natural
+import           Network.Simple.TCP
 
-import Action.Encryption
+import           Action.Encryption
 
 newtype FileServerIp =
   Ip String
@@ -31,12 +34,27 @@ class FileServerConfig a where
   fileServerIp :: a -> FileServerIp
   fileServerPort :: a -> FileServerPort
 
-readServerKeys ::
-     KeyRing a => B.ByteString -> B.ByteString -> B.ByteString -> Maybe a
-readServerKeys = undefined
-
-connectWithFileServer :: FileServerConfig a => a -> ((Socket, SockAddr) -> IO ()) -> IO ()
+connectWithFileServer ::
+     FileServerConfig a => a -> ((Socket, SockAddr) -> IO b) -> IO b
 connectWithFileServer config f = do
   let (Ip ip) = fileServerIp config
   let (Port port) = fileServerPort config
-  connect ip (show port) f 
+  connect ip (show port) f
+
+makeFileRequest ::
+     (FileServerConfig config, KeyRing config)
+  => config
+  -> PlainText (Message ByteString)
+  -> IO (Either String (PlainText (Message ByteString)))
+makeFileRequest c request =
+  connectWithFileServer c $ \(sock, addr) -> do
+    sendMessage c request sock
+    recvMessage c sock
+
+handshake :: (FileServerConfig config, KeyRing config) => config -> IO Bool
+handshake c =
+  connectWithFileServer c $ \(sock, addr) -> do
+    sendMessage c (toPlainText $ Message "handshake" "SCHWIFTY") sock
+    response <- recvMessage c sock
+    pure . flip (either (const False)) response $
+      (==) (toPlainText $ Message "handshake" "WUBALUBADUBDUB")

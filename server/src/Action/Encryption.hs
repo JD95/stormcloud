@@ -1,12 +1,14 @@
-{-# LANGUAGE DeriveFunctor #-}
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE DataKinds             #-}
+{-# LANGUAGE DeriveFunctor         #-}
+{-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings     #-}
 
 module Action.Encryption
   ( KeyRing(..)
   , Message(..)
   , Base16
+  , PlainText
   , toPlainText
   , encryptMessage
   , sendMessage
@@ -17,20 +19,20 @@ module Action.Encryption
   , decodeBase16Key
   ) where
 
-import Control.Monad
-import Control.Monad.IO.Class
-import Control.Monad.Loops
-import Crypto.Saltine.Class
-import Crypto.Saltine.Core.SecretBox
-import Crypto.Saltine.Internal.ByteSizes
-import Data.ByteString (ByteString)
-import qualified Data.ByteString as B
-import qualified Data.ByteString.Base16 as B16
-import qualified Data.ByteString.Char8 as BC
-import Data.Char
-import Data.List
-import Data.Monoid
-import Network.Simple.TCP
+import           Control.Monad
+import           Control.Monad.IO.Class
+import           Control.Monad.Loops
+import           Crypto.Saltine.Class
+import           Crypto.Saltine.Core.SecretBox
+import           Crypto.Saltine.Internal.ByteSizes
+import           Data.ByteString                   (ByteString)
+import qualified Data.ByteString                   as B
+import qualified Data.ByteString.Base16            as B16
+import qualified Data.ByteString.Char8             as BC
+import           Data.Char
+import           Data.List
+import           Data.Monoid
+import           Network.Simple.TCP
 
 newtype Base16 a =
   Base16 a
@@ -87,7 +89,7 @@ sendBase16 sock (Base16 b) = send sock b
 -- | Represents a message with a header and payload.
 data Message content
   = Message
-  { header :: B.ByteString
+  { header  :: B.ByteString
   , payload :: content
   } deriving (Functor)
 
@@ -142,7 +144,7 @@ sendMessage ::
 sendMessage key msg sock = do
   CipherText cipher <- encryptMessage key msg
   sendBase16 sock $
-    fmap (B.append (header cipher <> "\r\n") . (`B.append` "\r\n\r\n")) $
+    (B.append (header cipher <> "\r\n") . (`B.append` "\r\n\r\n")) <$>
     payload cipher
 
 -- | Converts a predicate into a maybe result.
