@@ -1,7 +1,7 @@
-{-# LANGUAGE DeriveFunctor #-}
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE DeriveFunctor         #-}
+{-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings     #-}
 
 module Action.Encryption
   ( KeyRing(..)
@@ -17,45 +17,26 @@ module Action.Encryption
   , decodeBase16Key
   ) where
 
-import Control.Monad
-import Control.Monad.IO.Class
-import Control.Monad.Loops
-import Crypto.Saltine.Class
-import Crypto.Saltine.Core.SecretBox
-import Crypto.Saltine.Internal.ByteSizes
-import Data.ByteString (ByteString)
-import qualified Data.ByteString as B
-import qualified Data.ByteString.Base16 as B16
-import qualified Data.ByteString.Char8 as BC
-import Data.Char
-import Data.List
-import Data.Monoid
-import Network.Simple.TCP
+import           Control.Monad
+import           Control.Monad.IO.Class
+import           Control.Monad.Loops
+import           Crypto.Saltine.Class
+import           Crypto.Saltine.Core.SecretBox
+import           Crypto.Saltine.Internal.ByteSizes
+import           Data.ByteString                   (ByteString)
+import qualified Data.ByteString                   as B
+import qualified Data.ByteString.Base16            as B16
+import qualified Data.ByteString.Char8             as BC
+import           Data.Char
+import           Data.List
+import           Data.Monoid
+import           Network.Simple.TCP
 
-newtype Base16 a =
-  Base16 a
-  deriving (Functor)
-
-class Base16Conv a where
-  fromBase16 :: Base16 a -> a
-  toBase16 :: a -> Base16 a
-
-instance (Monoid m) => Monoid (Base16 m) where
-  mempty = Base16 mempty
-  mappend (Base16 a) (Base16 b) = Base16 (a `mappend` b)
-
-instance Base16Conv ByteString
-  -- | A utility for reading encrypted messages.
-  --  Converts text from uppercase base 16 encoding.
-                                                     where
-  fromBase16 (Base16 b) = fst . B16.decode . BC.map toLower $ b
-  -- | A utility for creating encrypted messages.
-  --  Converts text to uppercase base 16 encoding.
-  toBase16 = Base16 . BC.map toUpper . B16.encode
+import Action.Base16
 
 -- | A utility for decoding raw bytestrings as a "Key".
 decodeBase16Key :: ByteString -> Maybe Key
-decodeBase16Key = decode . fromBase16 . Base16
+decodeBase16Key = decode . fromBase16 . toBase16 
 
 -- | A type which holds the Secret Key
 class KeyRing a where
@@ -65,10 +46,9 @@ class Encrypt a where
   encrypt :: KeyRing k => k -> a -> IO (Base16 a)
   decrypt :: KeyRing k => k -> Base16 a -> Either String a
 
-instance Encrypt ByteString
+instance Encrypt ByteString where
   -- | Encrypts plaintext using a randomly generated nonce.
   -- Returns the encrypted message prefixed with the nonce used.
-                                                                 where
   encrypt k b = do
     n <- newNonce
     pure (toBase16 $ encode n <> secretbox (key k) n b)
@@ -82,17 +62,16 @@ instance Encrypt ByteString
       (n, m) = B.splitAt secretBoxNonce $ fromBase16 b
 
 -- | Uses a "Socket" to send a "Base16" string.
-sendBase16 sock (Base16 b) = send sock b
+sendBase16 sock b = send sock . fromBase16 $ b
 
 -- | Represents a message with a header and payload.
-data Message content
-  = Message
-  { header :: B.ByteString
+data Message content = Message
+  { header  :: B.ByteString
   , payload :: content
   } deriving (Functor)
 
 instance (Eq content) => Eq (Message content) where
- (Message a b) == (Message c d) = a == c && b == d
+  (Message a b) == (Message c d) = a == c && b == d
 
 -- | Wraps content which is meant to be in plain text.
 -- Does not define a Show instance nor does it export its
@@ -134,11 +113,7 @@ decryptMessage key (CipherText msg) =
 -- they payload is prefixed with the nonce used to generate the message.
 -- The whole package is ended with \r\n\r\n.
 sendMessage ::
-     (KeyRing k)
-  => k
-  -> PlainText (Message ByteString)
-  -> Socket
-  -> IO ()
+     (KeyRing k) => k -> PlainText (Message ByteString) -> Socket -> IO ()
 sendMessage key msg sock = do
   CipherText cipher <- encryptMessage key msg
   sendBase16 sock $
@@ -172,14 +147,13 @@ breakReturn b = Just (m, B.drop (B.length "\r\n") n)
 
 -- | Attempts to parse out the header and payload of an encrypted message.
 parseHeaderAndPayload ::
-  ByteString
-  -> Either String (CipherText (Message (Base16 ByteString)))
+     ByteString -> Either String (CipherText (Message (Base16 ByteString)))
 parseHeaderAndPayload b
   | length sections /= 2 =
     Left "Could not parse header and content. Too many sections"
   | otherwise =
     Right . CipherText $
-    Message (head sections) (Base16 . head . tail $ sections)
+    Message (head sections) (toBase16 . head . tail $ sections)
   where
     sections = unfoldr breakReturn b
 

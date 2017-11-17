@@ -9,27 +9,27 @@ module Action.HandShake
   , FileServerConfig(..)
   ) where
 
-import Control.Monad.Loops
-import Crypto.Saltine.Class
-import Crypto.Saltine.Core.SecretBox
-import Crypto.Saltine.Internal.ByteSizes
-import Data.Aeson hiding (decode, encode)
-import Data.ByteString
+import           Control.Monad.Loops
+import           Crypto.Saltine.Class
+import           Crypto.Saltine.Core.SecretBox
+import           Crypto.Saltine.Internal.ByteSizes
+import           Data.Aeson hiding (decode, encode)
+import           Data.ByteString
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Base16 as B16
 import qualified Data.ByteString.Char8 as BC
-import Data.Char
-import Data.List
-import Data.Maybe
-import Data.Monoid
-import GHC.Generics
-import GHC.Natural
-import Network.Simple.TCP
-import Text.Read
+import           Data.Char
+import           Data.List
+import           Data.Maybe
+import           Data.Monoid
+import           GHC.Generics
+import           GHC.Natural
+import           Network.Simple.TCP
+import           Text.Read
 
-import Action.FileServer
-import Action.Parser
-import Action.Encryption
+import           Action.FileServer
+import           Action.Parser
+import           Action.Encryption
 
 data Test = Test
   { testIp :: String
@@ -66,11 +66,11 @@ test = do
   n <- newNonce
   config <- readTestConfig
   flip (either print) config $ \(_, t) -> do
-  connectWithFileServer t $ \(sock, addr) -> do
-    sendMessage t (toPlainText $ Message "hello" "test") sock
-    response <- recvMessage @Test t sock
-    flip (either print) response $ \p ->
-      if p == (toPlainText $ Message "test" "SCHWIFTY")
-        then print "Success!"
-        else print "Failure!"
+    connectWithFileServer t $ \(sock, addr) -> do
+      sendMessage t (toPlainText $ Message "hello" "test") sock
+      response <- recvMessage @Test t sock
+      flip (either print) response $ \p ->
+        if p == (toPlainText $ Message "test" "SCHWIFTY")
+            then print "Success!"
+              else print "Failure!"
 

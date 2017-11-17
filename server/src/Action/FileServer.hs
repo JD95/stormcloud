@@ -1,6 +1,8 @@
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE DeriveAnyClass        #-}
+{-# LANGUAGE DeriveGeneric         #-}
+{-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE OverloadedStrings, DeriveGeneric, DeriveAnyClass #-}
+{-# LANGUAGE OverloadedStrings     #-}
 
 module Action.FileServer
   ( FileServerIp(..)
@@ -9,15 +11,15 @@ module Action.FileServer
   , connectWithFileServer
   ) where
 
-import Data.Aeson
-import qualified Data.ByteString as B
-import Data.List
-import Data.Monoid
-import GHC.Generics
-import GHC.Natural
-import Network.Simple.TCP
+import           Data.Aeson
+import qualified Data.ByteString    as B
+import           Data.List
+import           Data.Monoid
+import           GHC.Generics
+import           GHC.Natural
+import           Network.Simple.TCP
 
-import Action.Encryption
+import           Action.Encryption
 
 newtype FileServerIp =
   Ip String
@@ -39,4 +41,4 @@ connectWithFileServer :: FileServerConfig a => a -> ((Socket, SockAddr) -> IO ()
 connectWithFileServer config f = do
   let (Ip ip) = fileServerIp config
   let (Port port) = fileServerPort config
-  connect ip (show port) f 
+  connect ip (show port) f

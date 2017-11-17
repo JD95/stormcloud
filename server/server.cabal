@@ -20,6 +20,7 @@ library
                      , Action.Encryption
                      , Action.FileServer
                      , Action.Parser
+                     , Action.Base16
                      , Authentication
                      , Config
                      , DatabaseActions
