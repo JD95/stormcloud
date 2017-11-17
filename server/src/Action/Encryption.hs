@@ -7,6 +7,7 @@ module Action.Encryption
   ( KeyRing(..)
   , Message(..)
   , Base16
+  , PlainText
   , toPlainText
   , encryptMessage
   , sendMessage
@@ -33,7 +34,6 @@ import           Data.Monoid
 import           Network.Simple.TCP
 
 import Action.Base16
-
 -- | A utility for decoding raw bytestrings as a "Key".
 decodeBase16Key :: ByteString -> Maybe Key
 decodeBase16Key = decode . fromBase16 . toBase16 
@@ -117,7 +117,7 @@ sendMessage ::
 sendMessage key msg sock = do
   CipherText cipher <- encryptMessage key msg
   sendBase16 sock $
-    fmap (B.append (header cipher <> "\r\n") . (`B.append` "\r\n\r\n")) $
+    (B.append (header cipher <> "\r\n") . (`B.append` "\r\n\r\n")) <$>
     payload cipher
 
 -- | Converts a predicate into a maybe result.

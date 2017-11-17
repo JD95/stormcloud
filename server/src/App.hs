@@ -1,43 +1,46 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, GADTs #-}
-{-# LANGUAGE MultiParamTypeClasses, TypeFamilies #-}
+{-# LANGUAGE DataKinds             #-}
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE GADTs                 #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE TypeFamilies          #-}
+{-# LANGUAGE TypeOperators         #-}
 
 module App where
 
-import Control.Monad.Logger (LoggingT, runStdoutLoggingT)
-import Crypto.Random
-import Data.Aeson hiding (json)
-import Data.HVect
-import qualified Data.List as List
-import Data.Time.Clock
-import qualified Database.Persist as P
-import Database.Persist hiding (get)
-import Database.Persist.Postgresql hiding (get)
-import GHC.Generics
-import Network.Wai.Handler.Warp
-import Network.Wai.Handler.WarpTLS
-import Network.Wai.Middleware.Cors
-import Network.Wai.Middleware.Static
-import Prelude ((!!), (==))
-import Protolude hiding (get, getContents)
-import System.IO hiding (print, putStrLn)
-import System.Process
-import Web.Spock
-import Web.Spock.Config
-import Web.Spock.Lucid
+import           Control.Monad.Logger          (LoggingT, runStdoutLoggingT)
+import           Crypto.Random
+import           Data.Aeson                    hiding (json)
+import           Data.HVect
+import qualified Data.List                     as List
+import           Data.Time.Clock
+import           Database.Persist              hiding (get)
+import qualified Database.Persist              as P
+import           Database.Persist.Postgresql   hiding (get)
+import           GHC.Generics
+import           Network.Wai.Handler.Warp
+import           Network.Wai.Handler.WarpTLS
+import           Network.Wai.Middleware.Cors
+import           Network.Wai.Middleware.Static
+import           Prelude                       ((!!), (==))
+import           Protolude                     hiding (get, getContents)
+import           System.IO                     hiding (print, putStrLn)
+import           System.Process
+import           Web.Spock
+import           Web.Spock.Config
+import           Web.Spock.Lucid
 
-import Action.UploadImage
-import Authentication
-import Config
-import DatabaseActions
-import DatabaseTypes
-import DefaultResponses
-import Login
-import Prefill
-import ServerTypes
-import Utilities
+import           Action.UploadImage
+import           Authentication
+import           Config
+import           DatabaseActions
+import           DatabaseTypes
+import           DefaultResponses
+import           Login
+import           Prefill
+import           ServerTypes
+import           Utilities
 
 launchServer :: Config -> IO ()
 launchServer config
@@ -97,12 +100,8 @@ withUser from f = do
 app :: Config -> ServerSecret -> API ()
 app config secret =
   prehook initHook $ do
-    get "hello" $ do
-      liftIO $ print "Hello!"
-      (text "hello!")
     -- User login
-    get ("login" <//> var) $ (login secret)
+    get ("login" <//> var) $ login secret
     prehook authHook $ do
-      get "happy" $ text "Congrats you're in the cool club"
       post "logout" logout
       post "upload-image" uploadimage
