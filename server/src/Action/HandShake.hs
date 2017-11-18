@@ -62,15 +62,15 @@ testResponse = "test\r\nE2AC2AE0A09AB908BE316433908728F385075B62E563D787A0538C7C
 
 testPayload = "E2AC2AE0A09AB908BE316433908728F385075B62E563D787A0538C7CC60C19234ACF98433C178984A4B65C15804AFF96" 
 
-test = do
-  n <- newNonce
-  config <- readTestConfig
-  flip (either print) config $ \(_, t) -> do
-    connectWithFileServer t $ \(sock, addr) -> do
-      sendMessage t (toPlainText $ Message "hello" "test") sock
-      response <- recvMessage @Test t sock
-      flip (either print) response $ \p ->
-        if p == (toPlainText $ Message "test" "SCHWIFTY")
-            then print "Success!"
-              else print "Failure!"
+-- test = do
+--   n <- newNonce
+--   config <- readTestConfig
+--   flip (either print) config $ \(_, t) -> do
+--     connectWithFileServer t $ \(sock, addr) -> do
+--       sendMessage t (toPlainText $ Message "hello" "test") sock
+--       response <- recvMessage @Test t sock
+--       flip (either print) response $ \p ->
+--         if p == (toPlainText $ Message "test" "SCHWIFTY")
+--             then print "Success!"
+--               else print "Failure!"
 

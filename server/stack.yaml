@@ -7,3 +7,8 @@ extra-deps: [time-units-1.0.0, saltine-0.1.0.0]
 flags: {}
 
 extra-package-dbs: []
+
+nix:
+  pure: true
+  enable: true
+  packages: [ gcc, ncurses, zlib, libsodium, pkgconfig, postgresql ]
