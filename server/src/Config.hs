@@ -1,9 +1,9 @@
+{-# LANGUAGE DeriveAnyClass        #-}
+{-# LANGUAGE DeriveGeneric         #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE StandaloneDeriving    #-}
+{-# LANGUAGE TypeApplications      #-}
 
 module Config
   ( Environment(..)
@@ -12,17 +12,19 @@ module Config
   , loadConfig
   ) where
 
-import Data.Aeson
-import GHC.Generics
-import Options.Applicative
-import qualified Prelude as P
-import Protolude
+import           Data.Aeson
+import           GHC.Generics
+import           Options.Applicative
+import qualified Prelude             as P
+import           Protolude
 
-import Action.HandShake
+import           Action.HandShake
 
 data Environment
   = Testing
   | Production
+  | MockForClient
+  | MockForStorage
 
 newtype DbConnStr =
   DbConnStr Text
@@ -35,10 +37,10 @@ instance P.Show DbConnStr where
   show (DbConnStr s) = P.show s
 
 data Config = Config
-  { dbConnStr :: DbConnStr
+  { dbConnStr  :: DbConnStr
   , prefillStr :: Text
-  , ip :: FileServerIp
-  , port :: FileServerPort
+  , ip         :: FileServerIp
+  , port       :: FileServerPort
   } deriving (Show, Generic, ToJSON, FromJSON)
 
 instance FileServerConfig Config where
@@ -67,7 +69,9 @@ optsInfo defaultConfig =
 loadConfig e = do
   let filePath =
         case e of
-          Testing -> "test-config.json"
-          Production -> "config.json"
+          Testing        -> "test-config.json"
+          MockForClient  -> "test-client-config.json"
+          MockForStorage -> "test-storage-config.json"
+          Production     -> "config.json"
   (Options filePath) <- execParser (optsInfo filePath)
   decode @Config . toS <$> readFile (toS filePath)

@@ -10,5 +10,5 @@ extra-package-dbs: []
 
 nix:
   pure: true
-  enable: true
+  enable: false 
   packages: [ gcc, ncurses, zlib, libsodium, pkgconfig, postgresql ]
