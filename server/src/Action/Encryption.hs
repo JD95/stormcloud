@@ -33,10 +33,10 @@ import           Data.List
 import           Data.Monoid
 import           Network.Simple.TCP
 
-import Action.Base16
+import           Action.Base16
 -- | A utility for decoding raw bytestrings as a "Key".
 decodeBase16Key :: ByteString -> Maybe Key
-decodeBase16Key = decode . fromBase16 . toBase16 
+decodeBase16Key = decode . fromBase16 . toBase16
 
 -- | A type which holds the Secret Key
 class KeyRing a where
@@ -47,11 +47,13 @@ class Encrypt a where
   decrypt :: KeyRing k => k -> Base16 a -> Either String a
 
 instance Encrypt ByteString where
+
   -- | Encrypts plaintext using a randomly generated nonce.
   -- Returns the encrypted message prefixed with the nonce used.
   encrypt k b = do
     n <- newNonce
     pure (toBase16 $ encode n <> secretbox (key k) n b)
+
   -- | Decrypts message enocded in base16, prefixed with a nonce.
   decrypt k b =
     case decode n :: Maybe Nonce of

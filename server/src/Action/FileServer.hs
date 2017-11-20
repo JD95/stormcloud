@@ -13,6 +13,7 @@ module Action.FileServer
 
 import           Data.Aeson
 import qualified Data.ByteString    as B
+import Data.ByteString (ByteString)
 import           Data.List
 import           Data.Monoid
 import           GHC.Generics

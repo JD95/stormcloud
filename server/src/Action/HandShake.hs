@@ -1,7 +1,7 @@
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveAnyClass    #-}
+{-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications  #-}
 
 module Action.HandShake
   ( FileServerIp
@@ -13,11 +13,11 @@ import           Control.Monad.Loops
 import           Crypto.Saltine.Class
 import           Crypto.Saltine.Core.SecretBox
 import           Crypto.Saltine.Internal.ByteSizes
-import           Data.Aeson hiding (decode, encode)
+import           Data.Aeson                        hiding (decode, encode)
 import           Data.ByteString
-import qualified Data.ByteString as B
-import qualified Data.ByteString.Base16 as B16
-import qualified Data.ByteString.Char8 as BC
+import qualified Data.ByteString                   as B
+import qualified Data.ByteString.Base16            as B16
+import qualified Data.ByteString.Char8             as BC
 import           Data.Char
 import           Data.List
 import           Data.Maybe
@@ -27,13 +27,14 @@ import           GHC.Natural
 import           Network.Simple.TCP
 import           Text.Read
 
+import           Action.Encryption
 import           Action.FileServer
 import           Action.Parser
-import           Action.Encryption
+
 
 data Test = Test
-  { testIp :: String
-  , testPort :: Natural
+  { testIp    :: String
+  , testPort  :: Natural
   , secretKey :: Key
   }
 
@@ -60,17 +61,17 @@ instance FileServerConfig Test where
 
 testResponse = "test\r\nE2AC2AE0A09AB908BE316433908728F385075B62E563D787A0538C7CC60C19234ACF98433C178984A4B65C15804AFF96\r\n\r\n"
 
-testPayload = "E2AC2AE0A09AB908BE316433908728F385075B62E563D787A0538C7CC60C19234ACF98433C178984A4B65C15804AFF96" 
+testPayload = "E2AC2AE0A09AB908BE316433908728F385075B62E563D787A0538C7CC60C19234ACF98433C178984A4B65C15804AFF96"
 
-test = do
-  n <- newNonce
-  config <- readTestConfig
-  flip (either print) config $ \(_, t) -> do
-    connectWithFileServer t $ \(sock, addr) -> do
-      sendMessage t (toPlainText $ Message "hello" "test") sock
-      response <- recvMessage @Test t sock
-      flip (either print) response $ \p ->
-        if p == (toPlainText $ Message "test" "SCHWIFTY")
-            then print "Success!"
-              else print "Failure!"
+-- test = do
+--   n <- newNonce
+--   config <- readTestConfig
+--   flip (either print) config $ \(_, t) -> do
+--     connectWithFileServer t $ \(sock, addr) -> do
+--       sendMessage t (toPlainText $ Message "hello" "test") sock
+--       response <- recvMessage @Test t sock
+--       flip (either print) response $ \p ->
+--         if p == (toPlainText $ Message "test" "SCHWIFTY")
+--             then print "Success!"
+--               else print "Failure!"
 
