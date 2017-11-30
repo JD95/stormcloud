@@ -9,6 +9,7 @@ module Action.HandShake
   , FileServerConfig(..)
   ) where
 
+import Protolude
 import           Control.Monad.Loops
 import           Crypto.Saltine.Class
 import           Crypto.Saltine.Core.SecretBox
@@ -26,36 +27,13 @@ import           GHC.Generics
 import           GHC.Natural
 import           Network.Simple.TCP
 import           Text.Read
+import Control.Concurrent.STM
+import qualified Data.Sequence as S
+import Data.Sequence (Sequence)
 
 import           Action.Encryption
 import           Action.FileServer
 import           Action.Parser
 
-
-data Test = Test
-  { testIp    :: String
-  , testPort  :: Natural
-  , secretKey :: Key
-  }
-
-objectValue name value =
-  quote *> symbol name *> quote *> colon *> value <* comma
-
-parseTest :: Parser Test
-parseTest = openCurly *> content <* closedCurly
-  where
-    content =
-      Test <$> (BC.unpack <$> objectValue "testIp" string) <*>
-      objectValue "testPort" int <*>
-      (fmap (fromJust . decodeBase16Key) $ objectValue "secretKey" string)
-
-readTestConfig :: IO (Either String ([ByteString], Test))
-readTestConfig = parse parseTest <$> B.readFile "test-config.json"
-
-instance KeyRing Test where
-  key = secretKey
-
-instance FileServerConfig Test where
-  fileServerIp = Ip . testIp
-  fileServerPort = Port . testPort
-
+pushCommand :: Sequence  -> (Text, Char)
+pushCommand t = 

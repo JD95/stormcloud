@@ -39,6 +39,7 @@ library
                      , aeson
                      , base16-bytestring
                      , bytestring
+                     , containers
                      , cryptohash
                      , cryptonite
                      , directory
