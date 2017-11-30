@@ -12,10 +12,11 @@ module Config
   , loadConfig
   ) where
 
+import           Crypto.Saltine.Core.SecretBox (Key)
 import           Data.Aeson
 import           GHC.Generics
 import           Options.Applicative
-import qualified Prelude             as P
+import qualified Prelude                       as P
 import           Protolude
 
 import           Action.HandShake
@@ -41,7 +42,8 @@ data Config = Config
   , prefillStr :: Text
   , ip         :: FileServerIp
   , port       :: FileServerPort
-  } deriving (Show, Generic, ToJSON, FromJSON)
+  , secretKey  :: Key
+  } deriving (Generic, ToJSON, FromJSON)
 
 instance FileServerConfig Config where
   fileServerIp = ip

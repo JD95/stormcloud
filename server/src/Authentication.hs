@@ -37,19 +37,16 @@ import DatabaseTypes
 import DefaultResponses
 import Login
 import Utilities
-
-newtype ServerSecret =
-  ServerSecret ByteString
+import ServerTypes
 
 sessionLength = 600 -- seconds
 
-genToken ::
-     ServerSecret -- ^ Random bytes unique to each bootup
-  -> ApiAction LoggedOut (Maybe Text)
-genToken (ServerSecret s) = do
+genToken :: ApiAction LoggedOut (Maybe Text)
+genToken = do
   headers <- fmap requestHeaders request
   num <- liftIO (getRandomBytes 16 :: IO ByteString)
   time <- liftIO $ fmap (diffTimeToPicoseconds . utctDayTime) getCurrentTime
+  (ServerSecret s) <- secret <$> getState
   let sessionId = do
         userAgent <- lookup "User-Agent" headers
         let referer = ""
@@ -59,12 +56,11 @@ genToken (ServerSecret s) = do
 
 genSession ::
      Text -- ^ The google token string from client
-  -> ServerSecret -- ^ Random bytes unique to each bootup
   -> ApiAction LoggedOut (Maybe ((Key User, User), Session))
-genSession idToken s = do
+genSession idToken = do
   t <- verify idToken
   print t
-  c' <- genToken s
+  c' <- genToken
   expr <- liftIO $ addUTCTime sessionLength <$> getCurrentTime
   fmap join . for c' $ \c ->
     for t $ \token -> do
@@ -84,9 +80,9 @@ genSession idToken s = do
             pure (i, u)
       pure ((userId, user), Session c expr userId)
 
-login :: ServerSecret -> Text -> ApiAction LoggedOut ()
-login serverSecret idToken = do
-  session <- genSession idToken serverSecret
+login :: Text -> ApiAction LoggedOut ()
+login idToken = do
+  session <- genSession idToken
   liftIO $ print session
   liftIO $ print "Login Attempt"
   case session of

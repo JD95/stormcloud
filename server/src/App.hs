@@ -9,6 +9,7 @@
 
 module App where
 
+import           Control.Concurrent.STM.TVar
 import           Control.Monad.Logger          (LoggingT, runStdoutLoggingT)
 import           Crypto.Random
 import           Data.Aeson                    hiding (json)
@@ -42,23 +43,31 @@ import           Prefill
 import           ServerTypes
 import           Utilities
 
+-- | A unique bytestring for use in session id creation,
+-- unique to each boot up
+serverSecret :: IO ByteString
+serverSecret = getRandomBytes 16
+
 launchServer :: Config -> IO ()
 launchServer config
-  -- Connect to Postgresql database with a connection pool of 5
  = do
   createTestDb
   let conn = toS (dbConnStr config) :: Text
+  -- Connect to Postgresql database with a connection pool of 5
   pool <- runStdoutLoggingT $ createPostgresqlPool (toS conn) 5
-  spockCfg <- defaultSpockCfg Nothing (PCPool pool) ()
+
+  s <- serverSecret
+  hist <- newTVarIO ""
+  let st = ServerState config (ServerSecret s) hist
+
+  spockCfg <- defaultSpockCfg Nothing (PCPool pool) st
   runStdoutLoggingT $
     (`runSqlPool` pool) $ do
       runMigration migrateAll
       loadTestData
-  -- A unique bytestring for use in session id creation,
-  -- unique to each boot up
-  secret <- getRandomBytes 16 :: IO ByteString
+
   -- Initialize the application
-  let middle = spock spockCfg (app config . ServerSecret $ secret)
+  let middle = spock spockCfg app
   httpServer middle
 
 httpServer = runSpock 4000
@@ -74,7 +83,7 @@ httpsServer mware
 
 -- | Default privilages
 initHook :: ApiAction () LoggedOut
-initHook = return HNil
+initHook = pure HNil
 
 -- | When user has an active session
 authHook :: ApiAction (HVect xs) (HVect ((Entity User) ': xs))
@@ -97,11 +106,11 @@ withUser from f = do
   f (from user)
 
 -- | The routing for the application
-app :: Config -> ServerSecret -> API ()
-app config secret =
+app :: API ()
+app =
   prehook initHook $ do
     -- User login
-    get ("login" <//> var) $ login secret
+    get ("login" <//> var) $ login
     prehook authHook $ do
       post "logout" logout
       post "upload-image" uploadimage

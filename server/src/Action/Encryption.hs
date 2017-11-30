@@ -24,16 +24,20 @@ import           Control.Monad.Loops
 import           Crypto.Saltine.Class
 import           Crypto.Saltine.Core.SecretBox
 import           Crypto.Saltine.Internal.ByteSizes
+import           Data.Aeson                        hiding (decode, encode)
 import           Data.ByteString                   (ByteString)
 import qualified Data.ByteString                   as B
 import qualified Data.ByteString.Base16            as B16
 import qualified Data.ByteString.Char8             as BC
 import           Data.Char
-import           Data.List
-import           Data.Monoid
+import           Data.List                         hiding (head)
+import           Data.Maybe
 import           Network.Simple.TCP
+import           Prelude                           hiding (head)
+import           Protolude
 
 import           Action.Base16
+
 -- | A utility for decoding raw bytestrings as a "Key".
 decodeBase16Key :: ByteString -> Maybe Key
 decodeBase16Key = decode . fromBase16 . toBase16
@@ -42,18 +46,26 @@ decodeBase16Key = decode . fromBase16 . toBase16
 class KeyRing a where
   key :: a -> Key
 
+instance FromJSON Key where
+  parseJSON =
+    withObject "secretKey" $ \o -> do
+      k <- decodeBase16Key . B.pack <$> o .: "secretKey"
+      maybe (fail "could not decode secret key") pure k
+
+instance ToJSON Key where
+  toJSON k = String (toS $ encode k)
+
 class Encrypt a where
   encrypt :: KeyRing k => k -> a -> IO (Base16 a)
   decrypt :: KeyRing k => k -> Base16 a -> Either String a
 
-instance Encrypt ByteString where
-
+instance Encrypt ByteString
   -- | Encrypts plaintext using a randomly generated nonce.
   -- Returns the encrypted message prefixed with the nonce used.
+                                                                 where
   encrypt k b = do
     n <- newNonce
     pure (toBase16 $ encode n <> secretbox (key k) n b)
-
   -- | Decrypts message enocded in base16, prefixed with a nonce.
   decrypt k b =
     case decode n :: Maybe Nonce of
@@ -150,14 +162,11 @@ breakReturn b = Just (m, B.drop (B.length "\r\n") n)
 -- | Attempts to parse out the header and payload of an encrypted message.
 parseHeaderAndPayload ::
      ByteString -> Either String (CipherText (Message (Base16 ByteString)))
-parseHeaderAndPayload b
-  | length sections /= 2 =
-    Left "Could not parse header and content. Too many sections"
-  | otherwise =
-    Right . CipherText $
-    Message (head sections) (toBase16 . head . tail $ sections)
-  where
-    sections = unfoldr breakReturn b
+parseHeaderAndPayload b =
+  case unfoldr breakReturn b of
+    [header, content] ->
+      Right . CipherText $ Message header (toBase16 $ content)
+    _ -> Left "Could not parse header and content. Too many sections"
 
 -- | Recieves a message with a header, encrypted payload prefixed by the nonce used to make it,
 -- and ended with \r\n\r\n.
