@@ -1,11 +1,11 @@
 {-# LANGUAGE DeriveFunctor     #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Action.Base16
-  ( Base16
-  , Base16Conv(..)
-  , toBase16
-  ) where
+module Action.Base16 where
+  -- ( Base16
+  -- , Base16Conv(..)
+  -- , toBase16
+  -- ) where
 
 import           Data.ByteString        (ByteString)
 import qualified Data.ByteString        as B

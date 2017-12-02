@@ -3,20 +3,20 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings     #-}
 
-module Action.Encryption
-  ( KeyRing(..)
-  , Message(..)
-  , Base16
-  , PlainText
-  , toPlainText
-  , encryptMessage
-  , sendMessage
-  , decryptMessage
-  , recvMessage
-  , fromBase16
-  , toBase16
-  , decodeBase16Key
-  ) where
+module Action.Encryption where
+  -- ( KeyRing(..)
+  -- , Message(..)
+  -- , Base16
+  -- , PlainText
+  -- , toPlainText
+  -- , encryptMessage
+  -- , sendMessage
+  -- , decryptMessage
+  -- , recvMessage
+  -- , fromBase16
+  -- , toBase16
+  -- , decodeBase16Key
+  -- ) where
 
 import           Control.Monad
 import           Control.Monad.IO.Class
@@ -132,9 +132,9 @@ sendMessage ::
      (KeyRing k) => k -> PlainText (Message ByteString) -> Socket -> IO ()
 sendMessage key msg sock = do
   CipherText cipher <- encryptMessage key msg
-  sendBase16 sock $
-    (B.append (header cipher <> "\r\n") . (`B.append` "\r\n\r\n")) <$>
-    payload cipher
+  let (Base16 b) = (B.append (header cipher <> "\r\n") . (`B.append` "\r\n\r\n")) <$> payload cipher
+  send sock b
+
 
 -- | Converts a predicate into a maybe result.
 maybePred :: (a -> Bool) -> (a -> Maybe a)
