@@ -33,9 +33,10 @@ import           Data.Char
 import           Data.List                         hiding (head)
 import           Data.Maybe
 import           Network.Simple.TCP
-import           Prelude                           hiding (head)
+import           Prelude                           hiding (head, undefined)
 import           Protolude
 
+import           Action.Audit
 import           Action.Base16
 
 -- | A utility for decoding raw bytestrings as a "Key".
@@ -178,3 +179,15 @@ recvMessage ::
 recvMessage key s =
   (decryptMessage key <=< parseHeaderAndPayload) . B.concat <$>
   recvUntilEnd s 2048
+
+verifyResponse ::
+     ByteString
+  -> CommandHistory
+  -> PlainText (Message ByteString)
+  -> Either ByteString ()
+verifyResponse header c (PlainText (Message h payload)) = do
+  when (header /= h) $
+    (Left $ "Recieved header " <> h <> " when expected " <> header)
+  maybe (Left "Response did not contain history")
+    (flip verifyCommandHistory c)
+    (snd <$> breakReturn payload)

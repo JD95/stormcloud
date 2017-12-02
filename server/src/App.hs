@@ -51,7 +51,6 @@ serverSecret = getRandomBytes 16
 launchServer :: Config -> IO ()
 launchServer config
  = do
-  createTestDb
   let conn = toS (dbConnStr config) :: Text
   -- Connect to Postgresql database with a connection pool of 5
   pool <- runStdoutLoggingT $ createPostgresqlPool (toS conn) 5
@@ -64,7 +63,6 @@ launchServer config
   runStdoutLoggingT $
     (`runSqlPool` pool) $ do
       runMigration migrateAll
-      loadTestData
 
   -- Initialize the application
   let middle = spock spockCfg app

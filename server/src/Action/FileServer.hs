@@ -12,8 +12,8 @@ module Action.FileServer
   ) where
 
 import           Data.Aeson
+import           Data.ByteString    (ByteString)
 import qualified Data.ByteString    as B
-import Data.ByteString (ByteString)
 import           Data.List
 import           Data.Monoid
 import           GHC.Generics
@@ -58,3 +58,19 @@ handshake c =
     response <- recvMessage c sock
     pure . flip (either (const False)) response $
       (==) (toPlainText $ Message "handshake" "WUBALUBADUBDUB")
+
+emergency :: (FileServerConfig config, KeyRing config) => ByteString -> config -> IO ()
+emergency m c =
+  connectWithFileServer c $ \(sock, addr) -> do
+    let msg = Message "header" $
+                ("ALL YOUR BASE ARE BELONG TO US:" <> m)
+    sendMessage c (toPlainText msg) sock
+
+store :: (FileServerConfig config, KeyRing config) => ByteString -> config -> IO (Either String ())
+store payload c =
+  connectWithFileServer c $ \(sock, addr) -> do
+    let msg = Message "header" $
+                ("store\r\n" <> payload)
+    sendMessage c (toPlainText msg) sock
+    response <- recvMessage c sock
+    pure $ flip fmap response $ \m -> undefined

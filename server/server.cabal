@@ -33,7 +33,7 @@ library
                      , Types
                      , Utilities
                      
-  build-depends:       base >= 4.7 && < 5
+  build-depends:       base >= 4.9 && < 5
                      , Spock
                      , Spock-lucid
                      , aeson
