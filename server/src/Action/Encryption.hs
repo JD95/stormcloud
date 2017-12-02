@@ -35,6 +35,7 @@ import           Data.Maybe
 import           Network.Simple.TCP
 import           Prelude                           hiding (head, undefined)
 import           Protolude
+import           System.Random
 
 import           Action.Audit
 import           Action.Base16
@@ -191,3 +192,10 @@ verifyResponse header c (PlainText (Message h payload)) = do
   maybe (Left "Response did not contain history")
     (flip verifyCommandHistory c)
     (snd <$> breakReturn payload)
+
+testVerifyResponse :: IO ()
+testVerifyResponse = do
+  g <- newStdGen
+  let header = "something"
+  let c@ (CommandHistory s _) = fst $ random g
+  undefined
