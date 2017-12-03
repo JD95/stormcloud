@@ -1,6 +1,6 @@
 # Base Stack Image
 
-FROM samdoshi/haskell-stack
+FROM ubuntu 
 
 CMD echo "Installing Git"
 
@@ -8,7 +8,10 @@ RUN apt-get update && apt-get install -y \
   git \
   pkg-config \
   libpq-dev \
-  libsodium-dev
+  libsodium-dev \
+  curl
+
+RUN curl -sSL https://get.haskellstack.org/ | sh
 
 RUN ["git", "clone", "https://github.com/JD95/stormcloud"]
 
