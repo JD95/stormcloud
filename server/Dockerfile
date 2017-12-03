@@ -10,4 +10,5 @@ COPY ["config.json", "/stormcloud/server/config.json"]
 
 RUN ["stack", "build"]
 
-CMD ["stack", "exec", "server-exe"]
+# CMD ["stack", "exec", "server-exe"]
+CMD ["/bin/bash"]

@@ -30,7 +30,6 @@ import           System.IO                     hiding (print, putStrLn)
 import           System.Process
 import           Web.Spock
 import           Web.Spock.Config
-import           Web.Spock.Lucid
 
 import           Action.UploadImage
 import           Authentication

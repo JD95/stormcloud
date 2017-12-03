@@ -34,7 +34,7 @@ import           Data.List                         hiding (head)
 import           Data.Maybe
 import           Network.Simple.TCP
 import           Prelude                           hiding (head, undefined)
-import           Protolude hiding (print)
+import           Protolude                         hiding (print)
 import           System.Random
 
 import           Action.Audit
@@ -50,12 +50,12 @@ class KeyRing a where
 
 instance FromJSON Key where
   parseJSON =
-    withObject "secretKey" $ \o -> do
-      k <- decodeBase16Key . B.pack <$> o .: "secretKey"
-      maybe (fail "could not decode secret key") pure k
+    withText "Key" $
+      maybe (fail "could not decode secret key") pure <$> decodeBase16Key . toS
+
 
 instance ToJSON Key where
-  toJSON k = String (toS $ encode k)
+  toJSON k = toJSON ((fmap toS . toBase16 $ encode k) :: Base16 Text)
 
 class Encrypt a where
   encrypt :: KeyRing k => k -> a -> IO (Base16 a)
@@ -181,7 +181,7 @@ recvMessage ::
 recvMessage key s = do
   p <- recvUntilEnd s 2048
   print p
-  pure $ ((decryptMessage key <=< parseHeaderAndPayload) . B.concat) p 
+  pure $ ((decryptMessage key <=< parseHeaderAndPayload) . B.concat) p
 
 verifyResponse ::
      ByteString
