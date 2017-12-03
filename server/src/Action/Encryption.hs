@@ -34,7 +34,7 @@ import           Data.List                         hiding (head)
 import           Data.Maybe
 import           Network.Simple.TCP
 import           Prelude                           hiding (head, undefined)
-import           Protolude
+import           Protolude hiding (print)
 import           System.Random
 
 import           Action.Audit
@@ -167,8 +167,9 @@ parseHeaderAndPayload ::
 parseHeaderAndPayload b =
   case unfoldr breakReturn b of
     [header, content] ->
-      Right . CipherText $ Message header (toBase16 $ content)
-    _ -> Left "Could not parse header and content. Too many sections"
+      Right . CipherText $ Message header (toBase16 content)
+    (_:_:_:_) -> Left "Could not parse header and content. Too many sections"
+    _ -> Left "Could not parse header and content. Too few sections"
 
 -- | Recieves a message with a header, encrypted payload prefixed by the nonce used to make it,
 -- and ended with \r\n\r\n.
@@ -177,9 +178,10 @@ recvMessage ::
   => k
   -> Socket
   -> IO (Either String (PlainText (Message ByteString)))
-recvMessage key s =
-  (decryptMessage key <=< parseHeaderAndPayload) . B.concat <$>
-  recvUntilEnd s 2048
+recvMessage key s = do
+  p <- recvUntilEnd s 2048
+  print p
+  pure $ ((decryptMessage key <=< parseHeaderAndPayload) . B.concat) p 
 
 verifyResponse ::
      ByteString

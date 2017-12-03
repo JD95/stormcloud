@@ -79,4 +79,7 @@ store payload c =
     let msg = Message "store" $ payload
     sendMessage c (toPlainText msg) sock
     response <- recvMessage c sock
-    pure $ flip fmap response $ \m -> () 
+    case response of
+      Right (PlainText (Message b p )) -> print p
+      Left e -> print e 
+    pure $ pure ()
