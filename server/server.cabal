@@ -20,6 +20,7 @@ library
                      , Action.Encryption
                      , Action.FileServer
                      , Action.Parser
+                     , Action.Base16
                      , Authentication
                      , Config
                      , DatabaseActions
@@ -32,12 +33,13 @@ library
                      , Types
                      , Utilities
                      
-  build-depends:       base >= 4.7 && < 5
+  build-depends:       base >= 4.9 && < 5
                      , Spock
                      , Spock-lucid
                      , aeson
                      , base16-bytestring
                      , bytestring
+                     , containers
                      , cryptohash
                      , cryptonite
                      , directory
@@ -46,6 +48,7 @@ library
                      , memory
                      , microlens-platform
                      , monad-logger
+                     , monad-loops
                      , mtl
                      , network-simple
                      , optparse-applicative
@@ -55,6 +58,8 @@ library
                      , process
                      , protolude
                      , random
+                     , saltine
+                     , stm
                      , text
                      , time
                      , time-units
@@ -64,8 +69,6 @@ library
                      , warp
                      , warp-tls
                      , wreq
-                     , saltine
-                     , monad-loops
   default-language:    Haskell2010
 
 Executable server-exe

@@ -1,7 +1,7 @@
 import socket
 from nacl.public import PrivateKey, Box
 private = PrivateKey.generate()
-public = pricate.public_key
+public = private.public_key
 
 
 def listen():
@@ -14,10 +14,10 @@ def listen():
 		print(address)
 		while True:
 			data = current_connection.recv(2048)
+			print(data)
 			if "random:" in data:
 				print("'You' is trying to connect, do something.. or not, whatever.")
-
-
+			break
 
 			'''
 			if data == 'quit\r\n':
