@@ -21,6 +21,7 @@ library
                      , Action.FileServer
                      , Action.Parser
                      , Action.Base16
+                     , Action.Audit
                      , Authentication
                      , Config
                      , DatabaseActions
