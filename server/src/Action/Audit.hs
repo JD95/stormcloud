@@ -2,17 +2,21 @@
 
 module Action.Audit where
 
-import qualified Control.Monad         as M
-import qualified Data.ByteString.Char8 as B
-import           Data.Sequence         ((<|))
-import qualified Data.Sequence         as S
+import           Control.Concurrent.STM.TVar
+import qualified Control.Monad               as M
+import qualified Data.ByteString.Char8       as B
+import           Data.Sequence               ((<|))
+import qualified Data.Sequence               as S
 import           Data.Time.Calendar
 import           Data.Time.Clock
 import           DatabaseTypes
 import           GHC.Natural
-import           Prelude               (Show (..))
-import           Protolude             hiding (empty, guard, show, splitAt)
+import           Prelude                     (Show (..))
+import           Protolude                   hiding (empty, guard, show,
+                                              splitAt)
 import           System.Random
+
+import           Error
 
 data StorageAction
   = Store
@@ -57,6 +61,9 @@ data CommandHistory = CommandHistory
   , userActions    :: Seq (Action UserAction)
   } deriving (Show)
 
+class Audit a where
+  cmdHistory :: a -> TVar CommandHistory
+
 randomStorageActions :: RandomGen g => g -> [Action StorageAction]
 randomStorageActions g = take 50 $ (Action time user) <$> (randoms g :: [StorageAction])
   where time = UTCTime (fromGregorian 2017 12 1) (secondsToDiffTime 3000)
@@ -83,21 +90,16 @@ popAction (CommandHistory ss us) = (CommandHistory ss' us', dus, dss)
     (ss', dss) = S.splitAt 50 ss
     (us', dus) = S.splitAt 50 us
 
-verifyCommand :: Char -> Action StorageAction -> Either B.ByteString ()
+verifyCommand :: Char -> Action StorageAction -> Validation ()
 verifyCommand 's' (Action _ _ Store)    = pure ()
 verifyCommand 'r' (Action _ _ Retrieve) = pure ()
 verifyCommand 'd' (Action _ _ Delete)   = pure ()
-verifyCommand c a = Left $ B.pack $ "History mismatch at " <> [c] <> " " <> show a
+verifyCommand c a = Left . ErrorMessage $ B.pack $ "History mismatch at " <> [c] <> " " <> show a
 
-verifyCommandHistory :: ByteString -> CommandHistory -> Either B.ByteString ()
+verifyCommandHistory :: ByteString -> CommandHistory -> Validation ()
 verifyCommandHistory b c = do
   when (B.length b /= (S.length . storageActions) c) $
-    (Left "Lengths of histories do not match")
+    (Left . ErrorMessage $ "Lengths of histories do not match")
   foldr (>>) (pure ()) $
     S.zipWith verifyCommand (S.fromList (B.unpack b)) (storageActions c)
 
-testVerifyCommandHistory :: IO ()
-testVerifyCommandHistory = do
-  g <- newStdGen
-  let c@ (CommandHistory s _) = fst $ random g
-  print $ verifyCommandHistory (packStorageHistory s) c

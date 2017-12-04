@@ -31,6 +31,7 @@ import           System.Process
 import           Web.Spock
 import           Web.Spock.Config
 
+import           Action.Audit
 import           Action.UploadImage
 import           Authentication
 import           Config
@@ -55,7 +56,7 @@ launchServer config
   pool <- runStdoutLoggingT $ createPostgresqlPool (toS conn) 5
 
   s <- serverSecret
-  hist <- newTVarIO ""
+  hist <- newTVarIO initialCommandHistory
   let st = ServerState config (ServerSecret s) hist
 
   spockCfg <- defaultSpockCfg Nothing (PCPool pool) st

@@ -64,10 +64,10 @@ loadConfig e = do
           Production     -> "config.json"
   decode @Config . toS <$> readFile filePath
 
-test = do
-  print "Test"
-  case testConfig of
-    Just c -> do
-        store "qwerty\r\nA71247DEDFFFFBAE" c
-        print "Success"
+-- test = do
+--   print "Test"
+--   case testConfig of
+--     Just c -> do
+--         store "qwerty\r\nA71247DEDFFFFBAE" c
+--         print "Success"
 

@@ -21,10 +21,12 @@ module Action.Encryption where
 import           Control.Monad
 import           Control.Monad.IO.Class
 import           Control.Monad.Loops
+import           Control.Monad.STM
 import           Crypto.Saltine.Class
 import           Crypto.Saltine.Core.SecretBox
 import           Crypto.Saltine.Internal.ByteSizes
 import           Data.Aeson                        hiding (decode, encode)
+import           Data.Bifunctor
 import           Data.ByteString                   (ByteString)
 import qualified Data.ByteString                   as B
 import qualified Data.ByteString.Base16            as B16
@@ -39,6 +41,7 @@ import           System.Random
 
 import           Action.Audit
 import           Action.Base16
+import           Error
 
 -- | A utility for decoding raw bytestrings as a "Key".
 decodeBase16Key :: ByteString -> Maybe Key
@@ -51,8 +54,7 @@ class KeyRing a where
 instance FromJSON Key where
   parseJSON =
     withText "Key" $
-      maybe (fail "could not decode secret key") pure <$> decodeBase16Key . toS
-
+    maybe (fail "could not decode secret key") pure <$> decodeBase16Key . toS
 
 instance ToJSON Key where
   toJSON k = toJSON ((fmap toS . toBase16 $ encode k) :: Base16 Text)
@@ -121,9 +123,10 @@ decryptMessage ::
      (Encrypt b, KeyRing k)
   => k
   -> CipherText (Message (Base16 b))
-  -> Either String (PlainText (Message b))
+  -> Either ErrorMessage (PlainText (Message b))
 decryptMessage key (CipherText msg) =
-  PlainText . Message (header msg) <$> decrypt key (payload msg)
+  first (ErrorMessage . BC.pack) $
+  (PlainText . Message (header msg) <$> decrypt key (payload msg))
 
 -- | Encrypts a message using the key. Message is prefixed with the given header.
 -- they payload is prefixed with the nonce used to generate the message.
@@ -132,9 +135,10 @@ sendMessage ::
      (KeyRing k) => k -> PlainText (Message ByteString) -> Socket -> IO ()
 sendMessage key msg sock = do
   CipherText cipher <- encryptMessage key msg
-  let (Base16 b) = (B.append (header cipher <> "\r\n") . (`B.append` "\r\n\r\n")) <$> payload cipher
+  let (Base16 b) =
+        (B.append (header cipher <> "\r\n") . (`B.append` "\r\n\r\n")) <$>
+        payload cipher
   send sock b
-
 
 -- | Converts a predicate into a maybe result.
 maybePred :: (a -> Bool) -> (a -> Maybe a)
@@ -163,13 +167,16 @@ breakReturn b = Just (m, B.drop (B.length "\r\n") n)
 
 -- | Attempts to parse out the header and payload of an encrypted message.
 parseHeaderAndPayload ::
-     ByteString -> Either String (CipherText (Message (Base16 ByteString)))
+     ByteString
+  -> Either ErrorMessage (CipherText (Message (Base16 ByteString)))
 parseHeaderAndPayload b =
   case unfoldr breakReturn b of
-    [header, content] ->
-      Right . CipherText $ Message header (toBase16 content)
-    (_:_:_:_) -> Left "Could not parse header and content. Too many sections"
-    _ -> Left "Could not parse header and content. Too few sections"
+    [header, content] -> Right . CipherText $ Message header (toBase16 content)
+    (_:_:_:_) ->
+      Left
+        (ErrorMessage "Could not parse header and content. Too many sections")
+    _ ->
+      Left (ErrorMessage "Could not parse header and content. Too few sections")
 
 -- | Recieves a message with a header, encrypted payload prefixed by the nonce used to make it,
 -- and ended with \r\n\r\n.
@@ -177,27 +184,22 @@ recvMessage ::
      (KeyRing k)
   => k
   -> Socket
-  -> IO (Either String (PlainText (Message ByteString)))
+  -> IO (Either ErrorMessage (PlainText (Message ByteString)))
 recvMessage key s = do
   p <- recvUntilEnd s 2048
   print p
   pure $ ((decryptMessage key <=< parseHeaderAndPayload) . B.concat) p
 
-verifyResponse ::
-     ByteString
-  -> CommandHistory
-  -> PlainText (Message ByteString)
-  -> Either ByteString ()
-verifyResponse header c (PlainText (Message h payload)) = do
-  when (header /= h) $
-    (Left $ "Recieved header " <> h <> " when expected " <> header)
-  maybe (Left "Response did not contain history")
-    (flip verifyCommandHistory c)
-    (snd <$> breakReturn payload)
+
+validateWith ::
+     PlainText (Message ByteString)
+  -> (Message ByteString -> STM (Validation a))
+  -> STM (Validation a)
+validateWith (PlainText m) f = f m
 
 testVerifyResponse :: IO ()
 testVerifyResponse = do
   g <- newStdGen
   let header = "something"
-  let c@ (CommandHistory s _) = fst $ random g
+  let c@(CommandHistory s _) = fst $ random g
   undefined

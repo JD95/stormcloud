@@ -8,5 +8,5 @@ import           Config
 
 main :: IO ()
 main = do
-  config <- loadConfig Production
+  config <- loadConfig Testing
   maybe (print "Failed to open config file") launchServer config
