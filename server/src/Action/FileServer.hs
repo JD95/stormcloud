@@ -21,6 +21,7 @@ import qualified Data.ByteString             as B
 import           Data.List
 import           Data.Monoid
 import           GHC.Generics
+import Data.Sequence
 import           GHC.Natural
 import           Network.Simple.TCP
 
@@ -87,10 +88,13 @@ correctHeader header (Message h payload)
 syncedCommandHistory ::
      (Audit config)
   => config
+  -> Action StorageAction 
   -> Message ByteString
   -> STM (Validation ())
-syncedCommandHistory c (Message h payload) = do
+syncedCommandHistory c a (Message h payload) = do
   cmdHist <- readTVar $ cmdHistory c
+  let cmdHist' = cmdHist { storageActions = a <| (storageActions cmdHist)}
+  writeTVar (cmdHistory c) cmdHist' 
   pure $
     maybe
       (Left . ErrorMessage $ "Response did not contain history")
@@ -104,34 +108,46 @@ checkFor validations input =
 store ::
      (Audit state, FileServerConfig state, KeyRing state)
   => state
+  -> Action StorageAction
   -> ByteString
   -> IO (Validation ())
-store c =
-  storageCommand (Command "store") c $
-  checkFor [syncedCommandHistory c, correctHeader "store"]
+store c a =
+  storageCommand a c $
+  checkFor [syncedCommandHistory c a, correctHeader "store"]
 
 delete ::
   (Audit state, FileServerConfig state, KeyRing state)
   => state
+  -> Action StorageAction
   -> ByteString
   -> IO (Validation ())
-delete c =
-  storageCommand (Command "delete") c $
-  checkFor [syncedCommandHistory c, correctHeader "delete"]
+delete c a =
+  storageCommand a c $
+  checkFor [syncedCommandHistory c a, correctHeader "delete"]
+
+retrieve ::
+  (Audit state, FileServerConfig state, KeyRing state)
+  => state
+  -> Action StorageAction
+  -> ByteString
+  -> IO (Validation ())
+retrieve c a =
+  storageCommand a c $
+  checkFor [syncedCommandHistory c a, correctHeader "retrieve"]
 
 newtype Command =
   Command ByteString
 
 storageCommand ::
      (Audit state, FileServerConfig state, KeyRing state)
-  => Command
+  => Action StorageAction 
   -> state
   -> (Message ByteString -> STM (Validation a))
   -> ByteString
   -> IO (Validation a)
-storageCommand (Command cmd) c v payload =
+storageCommand a c v payload =
   connectWithFileServer c $ \(sock, addr) -> do
-    let msg = Message cmd payload
+    let msg = Message (toHeader a) payload
     sendMessage c (toPlainText msg) sock
     response <- recvMessage c sock
     either (pure . Left) (atomically . (`validateWith` v)) response

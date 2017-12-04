@@ -23,6 +23,7 @@ library
                      , Action.Base16
                      , Action.Audit
                      , Authentication
+                     , Error
                      , Config
                      , DatabaseActions
                      , DatabaseTypes

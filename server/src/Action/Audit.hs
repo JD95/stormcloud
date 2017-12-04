@@ -24,6 +24,14 @@ data StorageAction
   | Delete
     deriving (Show)
 
+class ToHeader a where
+  toHeader :: a -> ByteString
+
+instance ToHeader StorageAction where
+  toHeader Store = "store"
+  toHeader Retrieve = "retrieve"
+  toHeader Delete = "delete"
+
 intToStorageAction :: Int -> StorageAction
 intToStorageAction i =
   case i `mod` 3 of
@@ -45,6 +53,9 @@ data Action a = Action
   , actionUser :: User
   , action     :: a
   }
+
+instance (ToHeader a) => ToHeader (Action a) where
+  toHeader (Action _ _ a) = toHeader a
 
 packStorageHistory :: Seq (Action StorageAction) -> ByteString
 packStorageHistory = foldl' f ""
