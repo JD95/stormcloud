@@ -71,8 +71,8 @@ handshake c =
       (==) (toPlainText $ Message "handshake" "WUBALUBADUBDUB")
 
 emergency ::
-     (FileServerConfig config, KeyRing config) => ByteString -> config -> IO ()
-emergency m c =
+     (FileServerConfig config, KeyRing config) => config -> ByteString-> IO ()
+emergency c m=
   connectWithFileServer c $ \(sock, addr) -> do
     let msg = Message "header" $ ("ALL YOUR BASE ARE BELONG TO US:" <> m)
     sendMessage c (toPlainText msg) sock
@@ -135,3 +135,4 @@ storageCommand (Command cmd) c v payload =
     sendMessage c (toPlainText msg) sock
     response <- recvMessage c sock
     either (pure . Left) (atomically . (`validateWith` v)) response
+

@@ -11,6 +11,7 @@ import           Web.Spock
 import           Web.Spock.Config
 
 import           Action.Audit
+import           Action.Encryption
 import           Action.FileServer
 import           Config
 import           DatabaseTypes
@@ -24,6 +25,9 @@ data ServerState
   , secret :: ServerSecret
   , cmds   :: TVar CommandHistory
   }
+
+instance KeyRing ServerState where
+  key = key . config
 
 instance FileServerConfig ServerState where
   fileServerIp = fileServerIp . config

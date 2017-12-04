@@ -75,7 +75,7 @@ httpsServer mware
  = do
   app <- spockAsApp mware
   let serverSettings =
-        defaultSettings & setPort 4000 & setServerName "Raffle App"
+        defaultSettings & setPort 4000 & setServerName "stormcloud"
     -- Run the server using HTTPS and settings
   runTLS defaultTlsSettings serverSettings app
 
@@ -110,5 +110,10 @@ app =
     -- User login
     get ("login" <//> var) $ login
     prehook authHook $ do
+      get "login-check" $ json True
       post "logout" logout
-      post "upload-image" uploadimage
+
+      -- File Server Actions
+      post "store" $ json True
+      post "retrieve" $ json True
+      post "delete" $ json True

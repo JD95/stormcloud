@@ -6,4 +6,5 @@ type Validation a = Either ErrorMessage a
 
 newtype ErrorMessage =
   ErrorMessage BC.ByteString
+  deriving (Show, Eq, Ord)
 

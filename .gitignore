@@ -116,3 +116,4 @@ fastlane/screenshots
 fastlane/test_output
 
 #Custom
+/server/src/#Tests.hs#
