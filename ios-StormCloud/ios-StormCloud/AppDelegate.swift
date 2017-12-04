@@ -27,23 +27,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
             // [END_EXCLUDE]
         } else {
             // Perform any operations on signed in user here.
-            let userId = user.userID                  // For client-side use only!
+//            let userId = user.userID                  // For client-side use only!
             let idToken = user.authentication.idToken // Safe to send to the server
             let fullName = user.profile.name
-            let givenName = user.profile.givenName
-            let familyName = user.profile.familyName
-            let email = user.profile.email
+//            let givenName = user.profile.givenName
+//            let familyName = user.profile.familyName
+//            let email = user.profile.email
             // [START_EXCLUDE]
             NotificationCenter.default.post(
                 name: Notification.Name(rawValue: "ToggleAuthUINotification"),
                 object: nil,
-                userInfo: ["statusText": "Signed in user:\n\(fullName)"])
+                userInfo: ["statusText": "Signed in: \(fullName!)"])
             // [END_EXCLUDE]
             
             if postToServer(idToken!) {
-                print("THE THING WAS SUCESSFUL!")
+                print("Log-in request was a success!")
             } else {
-                print("FUCK THE THING BROKE!")
+                print("Log-in request failed!")
             }
         }
     }
@@ -92,9 +92,58 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
 //            return false
 //        }
         task.resume()
+        print(task.response ?? (task.error ?? "No error or responce."))
         return true
     }
 
+    func accessEndpoint(_ idToken: String) -> Bool {
+        print("DOING THE THING!")
+        let url = URL(string: "http://10.11.195.133:4000/happy/")!
+        let session = URLSession.shared
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        
+        //        do {
+        //            request.httpBody = try JSONSerialization.data(withJSONObject: userData, options: .prettyPrinted)
+        //        } catch let error {
+        //            print(error.localizedDescription)
+        //            return false
+        //        }
+        //
+        //        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        //        request.addValue("application/json", forHTTPHeaderField: "Accept")
+        
+        print(request)
+        let task = session.dataTask(with: request as URLRequest, completionHandler: { data, response, error in
+            guard error == nil else {
+                return
+            }
+            
+            guard let data = data else {
+                return
+            }
+            
+            do {
+                if let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [String: Any] {
+                    print(json)
+                }
+            } catch let error {
+                print(error.localizedDescription)
+                return
+            }
+        })
+        //        do {
+        //
+        //
+        //        } catch let error {
+        //            print(error.localizedDescription)
+        //            return false
+        //        }
+        task.resume()
+//        print(task.response ?? (task.error ?? "No error or responce."))
+        return true
+    }
+    
     var window: UIWindow?
 
 
