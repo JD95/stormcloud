@@ -24,29 +24,6 @@ import Protolude
 
 import Types
 
-newtype URL =
-  URL Text
-  deriving (Show, Eq, Ord, Generic, ToJSON, FromJSON)
-
-newtype ISS =
-  ISS Text
-  deriving (Show, Eq, Ord, Generic, ToJSON, FromJSON)
-
-issVerify :: Text -> Maybe ISS
-issVerify t
-  | t == "accounts.google.com" = Just . ISS $ t
-  | t == "https://accounts.google.com" = Just . ISS $ t
-  | otherwise = Nothing
-
-newtype AUD =
-  AUD Text
-  deriving (Show, Eq, Ord, Generic, ToJSON, FromJSON)
-
-audVerify :: Text -> Maybe AUD
-audVerify a
-  | a == "942494335154-qltqhah21jbn3shv1a8pn79l0sd6s608" = Just . AUD $ a
-  | otherwise = Nothing
-
 data GoogleToken = GoogleToken
   { iss :: Text -- ^ Either accounts.google.com or https://accounts.google.com
   , sub :: Text

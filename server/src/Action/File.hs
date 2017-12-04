@@ -1,13 +1,4 @@
-{-# LANGUAGE DeriveAnyClass    #-}
-{-# LANGUAGE DeriveGeneric     #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeApplications  #-}
-
-module Action.HandShake
-  ( FileServerIp
-  , FileServerPort
-  , FileServerConfig(..)
-  ) where
+module Action.File where
 
 import           Control.Concurrent.STM
 import           Control.Monad.Loops
@@ -27,10 +18,15 @@ import qualified Data.Sequence                     as S
 import           GHC.Generics
 import           GHC.Natural
 import           Network.Simple.TCP
+import           Prelude                           ()
 import           Protolude
 import           Text.Read
 
+import           Action.Audit
 import           Action.Encryption
 import           Action.FileServer
-import           Action.Parser
+import           ServerTypes
+
+
+sendEmergencyMessage = undefined
 

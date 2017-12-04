@@ -2,16 +2,43 @@
 
 module ServerTypes where
 
-import Data.HVect
-import Data.Int
-import Database.Persist.Postgresql (SqlBackend)
-import Web.Spock
-import Web.Spock.Config
+import           Control.Concurrent.STM.TVar
+import           Data.HVect
+import           Data.Int
+import           Database.Persist.Postgresql (SqlBackend)
+import           Protolude
+import           Web.Spock
+import           Web.Spock.Config
 
-import DatabaseTypes
+import           Action.Audit
+import           Action.Encryption
+import           Action.FileServer
+import           Config
+import           DatabaseTypes
 
-type API context = SpockCtxM context SqlBackend (Maybe UserId) () ()
+newtype ServerSecret =
+  ServerSecret ByteString
 
-type ApiAction context a = SpockActionCtx context SqlBackend (Maybe UserId) () a
+data ServerState
+  = ServerState
+  { config :: Config
+  , secret :: ServerSecret
+  , cmds   :: TVar CommandHistory
+  }
+
+instance KeyRing ServerState where
+  key = key . config
+
+instance FileServerConfig ServerState where
+  fileServerIp = fileServerIp . config
+  fileServerPort = fileServerPort . config
+
+instance Audit ServerState where
+  cmdHistory = cmds
+
+type API context = SpockCtxM context SqlBackend (Maybe UserId) ServerState ()
+
+type ApiAction context = SpockActionCtx context SqlBackend (Maybe UserId) ServerState
 
 type LoggedOut = HVect '[]
+

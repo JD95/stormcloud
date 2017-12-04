@@ -1,4 +1,4 @@
-resolver: lts-8.21
+resolver: lts-9.14
 
 packages:
 - '.'
@@ -7,3 +7,8 @@ extra-deps: [time-units-1.0.0, saltine-0.1.0.0]
 flags: {}
 
 extra-package-dbs: []
+
+nix:
+  pure: true
+  enable: false 
+  packages: [ gcc, ncurses, zlib, libsodium, pkgconfig, postgresql ]
