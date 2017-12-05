@@ -116,4 +116,5 @@ fastlane/screenshots
 fastlane/test_output
 
 #Custom
+*.jpg
 ios-StormCloud/GoogleService-Info.plist

@@ -9,6 +9,8 @@
 
 module App where
 
+import qualified Data.ByteString as B
+import qualified Data.ByteString.Base16 as B16
 import           Control.Concurrent.STM.TVar
 import           Control.Monad.Logger          (LoggingT, runStdoutLoggingT)
 import           Crypto.Random
@@ -108,12 +110,19 @@ app :: API ()
 app =
   prehook initHook $ do
     -- User login
+    get "retrieve" $ do
+      r <- liftIO $ B.readFile "send.jpg"
+      text . toS $ B16.encode r 
+    -- File Server Actions
+    post "store" $ do
+      print "Jack sent something!"
+      b <- body
+      liftIO $ B.writeFile "send.jpg" b
+      json True
+    get "delete" $ json True
+
     get ("login" <//> var) $ login
     prehook authHook $ do
       get "login-check" $ json True
       post "logout" logout
-
-      -- File Server Actions
-      post "store" $ json True
-      post "retrieve" $ json True
-      post "delete" $ json True
+      

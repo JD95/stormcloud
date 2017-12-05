@@ -10,10 +10,10 @@ import           ServerTypes
 
 testCommands :: IO ()
 testCommands = do
-  config <- loadConfig Testing
+  config <- loadConfig Production
   cmdHist <- newTVarIO initialCommandHistory
   flip (maybe (print "Couldn't Load Config")) config $ \c ->  do
     let s = ServerState c (ServerSecret "") cmdHist
-    print =<< store s "DEDEDEDEDE"
-    print =<< delete s "DEDEDEDEDE"
+--    print =<< store s "DEDEDEDEDE"
+--    print =<< delete s "DEDEDEDEDE"
     print =<< emergency s "Someone set us up the bomb!"
