@@ -8,8 +8,31 @@
 
 import UIKit
 
+extension Formatter {
+    static let iso8601: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .iso8601)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateFormat = "yyyyMMddHHmmssSSSXXXXX"
+        return formatter
+    }()
+}
+extension Date {
+    var iso8601: String {
+        return Formatter.iso8601.string(from: self)
+    }
+}
+
+extension String {
+    var dateFromISO8601: Date? {
+        return Formatter.iso8601.date(from: self)   // "Mar 22, 2017, 10:22 AM"
+    }
+}
+
 class FileViewController : UIViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
     @IBOutlet weak var scrollView : UIScrollView!
+    @IBOutlet weak var fakeImageReadIn : UIImageView!
     
     @IBAction func importImage(_ sender: AnyObject) {
         let image = UIImagePickerController()
@@ -23,6 +46,18 @@ class FileViewController : UIViewController, UINavigationControllerDelegate, UII
         }
     }
     
+    @objc func unBlur(_ sender: AnyObject) {
+        sender.superview??.subviews[0].subviews[0].isHidden = true
+        (sender.self as! UIButton).isHidden = true
+    }
+    
+    @objc func deleteImage(_ sender: AnyObject) {
+        //delete the parent view and reorientate everything
+        print("Deleting image...")
+        _ = deleteImageRequest(URL(string: "http://10.11.195.133:4000/delete/\(sender.superview??.accessibilityLabel! ?? "blah")")!, param: [:])
+        sender.superview??.isHidden = true
+    }
+    
     var xPosition : CGFloat = 0
     var yPosition : CGFloat = 0
     var imageWidth : CGFloat = 0
@@ -31,19 +66,84 @@ class FileViewController : UIViewController, UINavigationControllerDelegate, UII
     
     override func viewDidLoad() {
         imageWidth = self.view.frame.width / 2.0
-        print("Frame Width:\t\(scrollView.frame.width)\nImage Width:\t\(imageWidth)\nSafe Area:\t\t\(self.view.frame.width)")
         imageHeight = imageWidth
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.showsVerticalScrollIndicator = true
         scrollView.alwaysBounceVertical = true
         scrollView.isScrollEnabled = true
+        _ = downloadImage(URL(string: "http://10.11.195.133:4000/retrieve/tiger/)")!, param: [:])
+        renderImage(fakeImageReadIn.image!, name: "tiger")
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         let image = info[UIImagePickerControllerOriginalImage] as! UIImage
-        renderImage(image)
-        imageUploadRequest(imageView: image, uploadUrl: NSURL(string: "http://10.11.195.133:4000/store")!, param: [:])
+        
+//        let calendar = Calendar.current
+        let datetime = Date().iso8601
+        let imgName = datetime+MyAppDelegate.idToken
+        renderImage(image, name: imgName)
+        print("Look at this shit: http://10.11.195.133:4000/store/\(datetime+MyAppDelegate.idToken)/")
+        imageUploadRequest(imageView: image, uploadUrl: NSURL(string: "http://10.11.195.133:4000/store/\(imgName)/")!, param: [:])
+        
         self.dismiss(animated: true, completion: nil)
+    }
+    
+    func downloadImage(_ downloadUrl: URL, param: [String:String]?) -> Bool {
+        let session = URLSession.shared
+        var request = URLRequest(url: downloadUrl)
+        request.httpMethod = "GET"
+        
+        print(request)
+        let task = session.dataTask(with: request as URLRequest, completionHandler: { data, response, error in
+            guard error == nil else {
+                return
+            }
+            
+            guard let data = data else {
+                return
+            }
+            
+            do {
+                if let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [String: Any] {
+                    print(json)
+                }
+            } catch let error {
+                print(error.localizedDescription)
+                return
+            }
+        })
+        task.resume()
+        print(task.response ?? (task.error ?? "No error or responce."))
+        return true
+    }
+    
+    func deleteImageRequest(_ downloadUrl: URL, param: [String:String]?) -> Bool {
+        let session = URLSession.shared
+        var request = URLRequest(url: downloadUrl)
+        request.httpMethod = "GET"
+        
+        print(request)
+        let task = session.dataTask(with: request as URLRequest, completionHandler: { data, response, error in
+            guard error == nil else {
+                return
+            }
+            
+            guard let data = data else {
+                return
+            }
+            
+            do {
+                if let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [String: Any] {
+                    print(json)
+                }
+            } catch let error {
+                print(error.localizedDescription)
+                return
+            }
+        })
+        task.resume()
+        print(task.response ?? (task.error ?? "No error or responce."))
+        return true
     }
     
     func imageUploadRequest(imageView: UIImage, uploadUrl: NSURL, param: [String:String]?) {
@@ -61,54 +161,51 @@ class FileViewController : UIViewController, UINavigationControllerDelegate, UII
         
         request.httpBody = createBodyWithParameters(parameters: param, filePathKey: "file", imageDataKey: imageData! as NSData, boundary: boundary) as Data
         
-        //myActivityIndicator.startAnimating();
-        
-        let task =  URLSession.shared.dataTask(with: request as URLRequest,
-                                                                     completionHandler: {
-                                                                        (data, response, error) -> Void in
-                                                                        if let data = data {
-                                                                            
-                                                                            // You can print out response object
-                                                                            print("******* response = \(String(describing: response))")
-                                                                            
-                                                                            print(data.count)
-                                                                            // you can use data here
-                                                                            
-                                                                            // Print out reponse body
-//                                                                            let responseString = NSString(data: data, encoding: String.Encoding.utf8.rawValue)
-//                                                                            print("****** response data = \(responseString!)")
-//
-//                                                                            let json =  try!JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? NSDictionary
-//
-//                                                                            print("json value \(String(describing: json))")
-                                                                            
-                                                                            //var json = NSJSONSerialization.JSONObjectWithData(data, options: .MutableContainers, error: &err)
-                                                                            
-//                                                                            let dispatch = DispatchQueue()
-//                                                                            let group : DispatchGroup
-//                                                                            group.setTarget(queue: dispatch)
-//                                                                            dispatch.async(group: group, execute: {
-//                                                                                //self.myActivityIndicator.stopAnimating()
-//                                                                                //self.imageView.image = nil;
-//                                                                            });
-                                                                            
-                                                                        } else if let error = error {
-                                                                            print(error.localizedDescription)
-                                                                        }
+        let task = URLSession.shared.dataTask(with: request as URLRequest,
+                                              completionHandler: {
+                                                    (data, response, error) -> Void in
+                                                    if let data = data {
+                                                        // You can print out response object
+                                                        print("******* response = \(String(describing: response))")
+                                                        
+                                                        print(data.count)
+                                                        
+                                                    } else if let error = error {
+                                                        print(error.localizedDescription)
+                                                    }
         })
         task.resume()
-        
-        
     }
     
-    func renderImage(_ image: UIImage) {
+    func renderImage(_ image: UIImage, name: String) {
+        let myView = UIView()
         let myImageView = UIImageView(image: image)
+        myView.frame.size.width = imageWidth
+        myView.frame.size.height = imageHeight
+        myView.frame.origin.x = xPosition
+        myView.frame.origin.y = yPosition
         myImageView.frame.size.width = imageWidth
         myImageView.frame.size.height = imageHeight
-        myImageView.frame.origin.x = xPosition
-        myImageView.frame.origin.y = yPosition
+        myImageView.frame.origin.x = 0
+        myImageView.frame.origin.y = 0
+        myView.addSubview(myImageView)
+        myView.accessibilityLabel = name
+        let deleteButton = UIButton(frame: CGRect(x: imageWidth / 4.0 + 32, y: -(imageWidth / 4.0) - 32, width: imageWidth, height: imageHeight))
+        deleteButton.setTitle("X", for: .normal)
+        deleteButton.addTarget(self, action: #selector(deleteImage(_:)), for: .touchUpInside)
+        myView.addSubview(deleteButton)
         
-        scrollView.addSubview(myImageView)
+        let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.dark)
+        let blurView = UIVisualEffectView(effect: blurEffect)
+        blurView.frame = myImageView.frame
+        myImageView.addSubview(blurView)
+        
+        let blurButton = UIButton(frame: CGRect(x: 0, y: 0, width: imageWidth, height: imageHeight))
+        blurButton.setTitle("Show Image", for: .normal)
+        blurButton.addTarget(self, action: #selector(unBlur(_:)), for: .touchUpInside)
+        myView.addSubview(blurButton)
+        
+        scrollView.addSubview(myView)
         xPosition += imageWidth
         
         if xPosition + imageWidth > view.frame.width {
