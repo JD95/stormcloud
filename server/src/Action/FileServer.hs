@@ -1,8 +1,8 @@
-{-# LANGUAGE DeriveAnyClass        #-}
-{-# LANGUAGE DeriveGeneric         #-}
-{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Action.FileServer where
   -- ( FileServerIp(..)
@@ -12,22 +12,22 @@ module Action.FileServer where
   -- , store
   -- ) where
 
-import           Control.Concurrent.STM.TVar
-import           Control.Monad
-import           Control.Monad.STM
-import           Data.Aeson
-import           Data.ByteString             (ByteString)
-import qualified Data.ByteString             as B
-import           Data.List
-import           Data.Monoid
-import           GHC.Generics
+import Control.Concurrent.STM.TVar
+import Control.Monad
+import Control.Monad.STM
+import Data.Aeson
+import Data.ByteString (ByteString)
+import qualified Data.ByteString as B
+import Data.List
+import Data.Monoid
 import Data.Sequence
-import           GHC.Natural
-import           Network.Simple.TCP
+import GHC.Generics
+import GHC.Natural
+import Network.Simple.TCP
 
-import           Action.Audit
-import           Action.Encryption
-import           Error
+import Action.Audit
+import Action.Encryption
+import Error
 
 newtype FileServerIp =
   Ip String
@@ -72,8 +72,8 @@ handshake c =
       (==) (toPlainText $ Message "handshake" "WUBALUBADUBDUB")
 
 emergency ::
-     (FileServerConfig config, KeyRing config) => config -> ByteString-> IO ()
-emergency c m=
+     (FileServerConfig config, KeyRing config) => config -> ByteString -> IO ()
+emergency c m =
   connectWithFileServer c $ \(sock, addr) -> do
     let msg = Message "header" $ ("ALL YOUR BASE ARE BELONG TO US:" <> m)
     sendMessage c (toPlainText msg) sock
@@ -85,16 +85,34 @@ correctHeader header (Message h payload)
     (pure . Left . ErrorMessage $
      "Recieved header " <> h <> " when expected " <> header)
 
+validateRetrieve ::
+     (Audit config)
+  => config
+  -> ByteString
+  -> Action StorageAction
+  -> Message ByteString
+  -> STM (Validation ByteString)
+validateRetrieve a header ac m@(Message h payload) = do
+  goodHeader <- correctHeader header m
+  sync <- syncedCommandHistory a ac m
+  pure $ do
+    goodHeader
+   -- sync
+    maybe
+      (Left . ErrorMessage $ "Malformed packet")
+      (Right . fst)
+      (breakReturn payload)
+
 syncedCommandHistory ::
      (Audit config)
   => config
-  -> Action StorageAction 
+  -> Action StorageAction
   -> Message ByteString
   -> STM (Validation ())
 syncedCommandHistory c a (Message h payload) = do
   cmdHist <- readTVar $ cmdHistory c
-  let cmdHist' = cmdHist { storageActions = a <| (storageActions cmdHist)}
-  writeTVar (cmdHistory c) cmdHist' 
+  let cmdHist' = cmdHist {storageActions = a <| (storageActions cmdHist)}
+  writeTVar (cmdHistory c) cmdHist'
   pure $
     maybe
       (Left . ErrorMessage $ "Response did not contain history")
@@ -115,32 +133,32 @@ store c a =
   storageCommand a c $
   checkFor [syncedCommandHistory c a, correctHeader "store"]
 
+retrieve ::
+            (Audit state, FileServerConfig state, KeyRing state)
+  => state
+  -> Action StorageAction
+  -> ByteString
+  -> IO (Validation ByteString)
+retrieve c a =
+  storageCommand a c $
+  validateRetrieve c "retrieve" a
+
 delete ::
-  (Audit state, FileServerConfig state, KeyRing state)
+     (Audit state, FileServerConfig state, KeyRing state)
   => state
   -> Action StorageAction
   -> ByteString
   -> IO (Validation ())
 delete c a =
   storageCommand a c $
-  checkFor [syncedCommandHistory c a, correctHeader "delete"]
-
-retrieve ::
-  (Audit state, FileServerConfig state, KeyRing state)
-  => state
-  -> Action StorageAction
-  -> ByteString
-  -> IO (Validation ())
-retrieve c a =
-  storageCommand a c $
-  checkFor [syncedCommandHistory c a, correctHeader "retrieve"]
+  correctHeader "delete"
 
 newtype Command =
   Command ByteString
 
 storageCommand ::
      (Audit state, FileServerConfig state, KeyRing state)
-  => Action StorageAction 
+  => Action StorageAction
   -> state
   -> (Message ByteString -> STM (Validation a))
   -> ByteString
@@ -151,4 +169,3 @@ storageCommand a c v payload =
     sendMessage c (toPlainText msg) sock
     response <- recvMessage c sock
     either (pure . Left) (atomically . (`validateWith` v)) response
-

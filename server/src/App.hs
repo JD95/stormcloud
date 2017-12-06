@@ -1,3 +1,4 @@
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE DataKinds             #-}
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE FlexibleInstances     #-}
@@ -110,19 +111,22 @@ app :: API ()
 app =
   prehook initHook $ do
     -- User login
-    get "retrieve" $ do
-      r <- liftIO $ B.readFile "send.jpg"
-      text . toS $ B16.encode r 
-    -- File Server Actions
-    post "store" $ do
-      print "Jack sent something!"
-      b <- body
-      liftIO $ B.writeFile "send.jpg" b
-      json True
-    get "delete" $ json True
-
     get ("login" <//> var) $ login
+
     prehook authHook $ do
       get "login-check" $ json True
       post "logout" logout
-      
+
+      get ("retrieve" <//> var) $ \(name::Text) -> do
+       r <- liftIO $ B.readFile "send.jpg"
+       text . toS $ B16.encode r 
+
+    -- File Server Actions
+      post ("store" <//> var) $ \(name::Text) -> do
+        print "Jack sent something!"
+        b <- body
+        bytes b
+
+      get ("delete" <//> var) $ \(name::Text) -> do
+        json True
+
