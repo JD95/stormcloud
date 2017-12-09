@@ -10,6 +10,9 @@ import           Protolude
 import           Web.Spock
 import           Web.Spock.Config
 
+import           Action.Audit
+import           Action.Encryption
+import           Action.FileServer
 import           Config
 import           DatabaseTypes
 
@@ -18,13 +21,24 @@ newtype ServerSecret =
 
 data ServerState
   = ServerState
-  { config     :: Config
-  , secret     :: ServerSecret
-  , cmdHistory :: TVar Text
+  { config :: Config
+  , secret :: ServerSecret
+  , cmds   :: TVar CommandHistory
   }
+
+instance KeyRing ServerState where
+  key = key . config
+
+instance FileServerConfig ServerState where
+  fileServerIp = fileServerIp . config
+  fileServerPort = fileServerPort . config
+
+instance Audit ServerState where
+  cmdHistory = cmds
 
 type API context = SpockCtxM context SqlBackend (Maybe UserId) ServerState ()
 
 type ApiAction context = SpockActionCtx context SqlBackend (Maybe UserId) ServerState
 
 type LoggedOut = HVect '[]
+

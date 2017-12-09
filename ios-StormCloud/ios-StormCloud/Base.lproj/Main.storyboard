@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="CZC-5i-g7M">
     <device id="retina5_9" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -10,10 +10,10 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--Login View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="ios_StormCloud" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="BYZ-38-t0r" userLabel="Login View Controller" customClass="LoginViewController" customModule="ios_StormCloud" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -30,14 +30,26 @@
                             </label>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="KK1-BF-VW1" customClass="GIDSignInButton">
                                 <rect key="frame" x="72.666666666666686" y="382" width="230" height="48"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="backgroundColor" red="0.016804177310000001" green="0.19835099580000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="230" id="5AG-Gf-KW3"/>
                                     <constraint firstAttribute="height" constant="48" id="WHG-id-Tjn"/>
                                 </constraints>
                             </view>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aGB-l1-jby" userLabel="Status Text">
-                                <rect key="frame" x="187.66666666666666" y="115" width="0.0" height="21"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XS0-yN-jSQ">
+                                <rect key="frame" x="157.66666666666666" y="462" width="60" height="30"/>
+                                <state key="normal" title="Sign Out">
+                                    <color key="titleColor" red="0.1450980392" green="0.14901960780000001" blue="0.1529411765" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JiP-0o-uyC">
+                                <rect key="frame" x="148.66666666666666" y="504" width="78" height="30"/>
+                                <state key="normal" title="Disconnect">
+                                    <color key="titleColor" red="0.1450980392" green="0.14901960780000001" blue="0.1529411765" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aGB-l1-jby" userLabel="Status Text">
+                                <rect key="frame" x="188" y="139" width="110" height="96"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="21" id="S3Q-2G-Eua"/>
                                 </constraints>
@@ -45,50 +57,149 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zY5-jv-Xrb">
-                                <rect key="frame" x="157" y="442" width="60" height="30"/>
-                                <state key="normal" title="Sign Out">
-                                    <color key="titleColor" red="0.14509803921568626" green="0.14901960784313725" blue="0.15294117647058825" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                </state>
-                                <connections>
-                                    <action selector="didTapSignOut:" destination="BYZ-38-t0r" eventType="touchUpInside" id="k95-iM-5Ea"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9N7-tW-wsm">
-                                <rect key="frame" x="102" y="571" width="178" height="30"/>
-                                <state key="normal" title="Disconnect">
-                                    <color key="titleColor" red="0.14509803921568626" green="0.14901960784313725" blue="0.15294117647058825" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                </state>
-                                <connections>
-                                    <action selector="didTapDisconnect:" destination="BYZ-38-t0r" eventType="touchUpInside" id="k7v-KE-0To"/>
-                                </connections>
-                            </button>
                         </subviews>
                         <color key="backgroundColor" red="0.61568627450980395" green="0.58823529411764708" blue="0.72156862745098038" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="top" secondItem="7NT-IK-Z4N" secondAttribute="top" constant="-16" id="19Q-Ya-Sjd"/>
-                            <constraint firstItem="aGB-l1-jby" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="1z6-GC-YNY"/>
                             <constraint firstItem="7NT-IK-Z4N" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="4yw-NL-3Kw"/>
-                            <constraint firstItem="zY5-jv-Xrb" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="Ef7-zI-vzX"/>
                             <constraint firstItem="KK1-BF-VW1" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="FaT-Wh-neo"/>
-                            <constraint firstItem="9N7-tW-wsm" firstAttribute="top" secondItem="zY5-jv-Xrb" secondAttribute="bottom" constant="12" id="Pjz-sz-aKi"/>
-                            <constraint firstItem="aGB-l1-jby" firstAttribute="top" secondItem="7NT-IK-Z4N" secondAttribute="bottom" constant="16" id="Xe2-6i-qXn"/>
-                            <constraint firstItem="zY5-jv-Xrb" firstAttribute="top" secondItem="KK1-BF-VW1" secondAttribute="bottom" constant="12" id="Zbn-5A-dRq"/>
-                            <constraint firstItem="9N7-tW-wsm" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="cfJ-FM-Aa8"/>
+                            <constraint firstItem="JiP-0o-uyC" firstAttribute="top" secondItem="XS0-yN-jSQ" secondAttribute="bottom" constant="12" id="LUW-ps-Z8c"/>
+                            <constraint firstItem="aGB-l1-jby" firstAttribute="top" secondItem="7NT-IK-Z4N" secondAttribute="bottom" constant="40" id="MBJ-S8-NGa"/>
+                            <constraint firstItem="aGB-l1-jby" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" constant="-32" id="YY0-qf-xAB"/>
+                            <constraint firstItem="XS0-yN-jSQ" firstAttribute="centerX" secondItem="KK1-BF-VW1" secondAttribute="centerX" id="Z6p-EC-vdZ"/>
+                            <constraint firstItem="aGB-l1-jby" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="Zh0-SL-pIs"/>
+                            <constraint firstItem="JiP-0o-uyC" firstAttribute="centerX" secondItem="KK1-BF-VW1" secondAttribute="centerX" id="eyk-Jz-JZh"/>
                             <constraint firstItem="KK1-BF-VW1" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="ozM-fh-7My"/>
+                            <constraint firstItem="XS0-yN-jSQ" firstAttribute="top" secondItem="KK1-BF-VW1" secondAttribute="bottom" constant="32" id="yKx-Hi-zaK"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
-                        <outlet property="disconnectButton" destination="9N7-tW-wsm" id="ZCA-RH-gVa"/>
+                        <outlet property="disconnectButton" destination="JiP-0o-uyC" id="Z5O-vr-d9B"/>
                         <outlet property="signInButton" destination="KK1-BF-VW1" id="qit-Mx-cxd"/>
-                        <outlet property="signOutButton" destination="zY5-jv-Xrb" id="pOO-u1-ZYH"/>
+                        <outlet property="signOutButton" destination="XS0-yN-jSQ" id="Vxg-4y-OrQ"/>
                         <outlet property="statusText" destination="aGB-l1-jby" id="5lS-55-RA2"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="136.80000000000001" y="133.00492610837438"/>
+            <point key="canvasLocation" x="597.60000000000002" y="-250.49261083743843"/>
+        </scene>
+        <!--Settings View Controller-->
+        <scene sceneID="PDI-9f-lZe">
+            <objects>
+                <viewController id="6hW-dz-seh" userLabel="Settings View Controller" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="rWY-fY-R5H">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="G0g-N1-LRU">
+                                <rect key="frame" x="157.66666666666666" y="371.66666666666669" width="60" height="30"/>
+                                <state key="normal" title="Sign Out">
+                                    <color key="titleColor" red="0.1450980392" green="0.14901960780000001" blue="0.1529411765" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="didTapSignOut:" destination="BYZ-38-t0r" eventType="touchUpInside" id="6hM-dP-84B"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="IQe-lY-cW7">
+                                <rect key="frame" x="148.66666666666666" y="413.66666666666669" width="78" height="30"/>
+                                <state key="normal" title="Disconnect">
+                                    <color key="titleColor" red="0.1450980392" green="0.14901960780000001" blue="0.1529411765" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="didTapDisconnect:" destination="BYZ-38-t0r" eventType="touchUpInside" id="6o8-cg-7xb"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="IQe-lY-cW7" firstAttribute="top" secondItem="G0g-N1-LRU" secondAttribute="bottom" constant="12" id="WfX-uJ-gJM"/>
+                            <constraint firstItem="G0g-N1-LRU" firstAttribute="centerY" secondItem="gFF-tz-PDQ" secondAttribute="centerY" id="gj3-Mw-OdH"/>
+                            <constraint firstItem="IQe-lY-cW7" firstAttribute="centerX" secondItem="gFF-tz-PDQ" secondAttribute="centerX" id="vGY-NW-2ts"/>
+                            <constraint firstItem="G0g-N1-LRU" firstAttribute="centerX" secondItem="gFF-tz-PDQ" secondAttribute="centerX" id="x4U-wN-mTH"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="gFF-tz-PDQ"/>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Settings" id="QcY-6l-WXU" userLabel="Settings"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="xEL-Cw-b2M" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2292" y="523.89162561576359"/>
+        </scene>
+        <!--Files View Controller-->
+        <scene sceneID="TSn-as-hds">
+            <objects>
+                <viewController id="CwK-uk-pwE" userLabel="Files View Controller" customClass="FileViewController" customModule="ios_StormCloud" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="bN0-Zf-XHF">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TS0-KM-dqv">
+                                <rect key="frame" x="329" y="40" width="30" height="51"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="32"/>
+                                <state key="normal" title="+"/>
+                                <connections>
+                                    <action selector="importImage:" destination="CwK-uk-pwE" eventType="touchUpInside" id="Rgb-YO-nji"/>
+                                </connections>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Files" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6At-Rx-CvD">
+                                <rect key="frame" x="16" y="44" width="64" height="39"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="32"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="desktop-year-of-the-tiger-images-wallpaper" translatesAutoresizingMaskIntoConstraints="NO" id="Y0h-kU-gjz">
+                                <rect key="frame" x="67" y="342" width="240" height="128"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qh5-lK-ATG">
+                                <rect key="frame" x="0.0" y="83" width="375" height="646"/>
+                            </scrollView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="6At-Rx-CvD" firstAttribute="top" secondItem="ErW-Fh-vZy" secondAttribute="top" id="Fl5-0Q-oaF"/>
+                            <constraint firstItem="qh5-lK-ATG" firstAttribute="centerX" secondItem="ErW-Fh-vZy" secondAttribute="centerX" id="Lby-z8-yEF"/>
+                            <constraint firstItem="qh5-lK-ATG" firstAttribute="top" secondItem="6At-Rx-CvD" secondAttribute="bottom" id="MGP-61-q9p"/>
+                            <constraint firstItem="TS0-KM-dqv" firstAttribute="trailing" secondItem="ErW-Fh-vZy" secondAttribute="trailing" constant="-16" id="Mqf-Fc-7nZ"/>
+                            <constraint firstItem="qh5-lK-ATG" firstAttribute="width" secondItem="bN0-Zf-XHF" secondAttribute="width" id="bxI-Gh-YxX"/>
+                            <constraint firstItem="TS0-KM-dqv" firstAttribute="bottom" secondItem="qh5-lK-ATG" secondAttribute="top" constant="8" symbolic="YES" id="gFm-rd-70B"/>
+                            <constraint firstItem="6At-Rx-CvD" firstAttribute="leading" secondItem="ErW-Fh-vZy" secondAttribute="leading" constant="16" id="i5M-gM-KHl"/>
+                            <constraint firstItem="qh5-lK-ATG" firstAttribute="bottom" secondItem="ErW-Fh-vZy" secondAttribute="bottom" id="xxU-OP-K6l"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="ErW-Fh-vZy"/>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Files" id="4MT-55-Cqm" userLabel="Files"/>
+                    <connections>
+                        <outlet property="fakeImageReadIn" destination="Y0h-kU-gjz" id="qha-Yi-zoS"/>
+                        <outlet property="scrollView" destination="qh5-lK-ATG" id="Yxw-s5-Njc"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="z8b-2b-DDJ" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2292" y="-250.49261083743843"/>
+        </scene>
+        <!--Tab Bar Controller-->
+        <scene sceneID="7xd-fQ-kjP">
+            <objects>
+                <tabBarController id="CZC-5i-g7M" sceneMemberID="viewController">
+                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="wxF-wL-2SA">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="49"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </tabBar>
+                    <connections>
+                        <segue destination="CwK-uk-pwE" kind="relationship" relationship="viewControllers" id="Gzb-fv-bNE"/>
+                        <segue destination="6hW-dz-seh" kind="relationship" relationship="viewControllers" id="dwa-Y1-T6g"/>
+                    </connections>
+                </tabBarController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="HuQ-Qp-h6W" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1484" y="152"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="desktop-year-of-the-tiger-images-wallpaper" width="1600" height="1200"/>
+    </resources>
 </document>

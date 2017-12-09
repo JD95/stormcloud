@@ -7,6 +7,7 @@ module Action.Base16 where
   -- , toBase16
   -- ) where
 
+import           Data.Aeson
 import           Data.ByteString        (ByteString)
 import qualified Data.ByteString        as B
 import qualified Data.ByteString.Base16 as B16
@@ -18,11 +19,11 @@ newtype Base16 a =
   deriving (Functor)
 
 class Base16Conv a where
-  
+
   -- | Test values to see if they are already in Base16
   isBase16 :: a -> Bool
 
-  -- | Convert a value into base16 and wrap it 
+  -- | Convert a value into base16 and wrap it
   encodeBase16 :: a -> Base16 a
 
   -- | Convert a value from base16
@@ -36,6 +37,9 @@ instance Base16Conv ByteString where
   fromBase16 (Base16 b) = fst . B16.decode . BC.map toLower $ b
   encodeBase16 = Base16 . BC.map toUpper . B16.encode
   isBase16 = BC.all (`BC.elem` "ABCDEF0123456789")
+
+instance (ToJSON a) => ToJSON (Base16 a) where
+  toJSON (Base16 a) = toJSON a
 
 {- |
   Encodes a value into base16 if it is not

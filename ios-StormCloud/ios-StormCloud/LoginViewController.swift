@@ -9,7 +9,7 @@
 import UIKit
 import GoogleSignIn
 
-class ViewController: UIViewController, GIDSignInUIDelegate {
+class LoginViewController: UIViewController, GIDSignInUIDelegate {
 
     @IBOutlet weak var signInButton: GIDSignInButton!
     @IBOutlet weak var signOutButton: UIButton!
@@ -31,7 +31,7 @@ class ViewController: UIViewController, GIDSignInUIDelegate {
         // TODO(developer) Configure the sign-in button look/feel
         // [START_EXCLUDE]
         NotificationCenter.default.addObserver(self,
-                                               selector: #selector(ViewController.receiveToggleAuthUINotification(_:)),
+                                               selector: #selector(LoginViewController.receiveToggleAuthUINotification(_:)),
                                                name: NSNotification.Name(rawValue: "ToggleAuthUINotification"),
                                                object: nil)
         

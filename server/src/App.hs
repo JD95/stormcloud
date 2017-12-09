@@ -1,3 +1,4 @@
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE DataKinds             #-}
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE FlexibleInstances     #-}
@@ -9,6 +10,8 @@
 
 module App where
 
+import qualified Data.ByteString as B
+import qualified Data.ByteString.Base16 as B16
 import           Control.Concurrent.STM.TVar
 import           Control.Monad.Logger          (LoggingT, runStdoutLoggingT)
 import           Crypto.Random
@@ -30,8 +33,8 @@ import           System.IO                     hiding (print, putStrLn)
 import           System.Process
 import           Web.Spock
 import           Web.Spock.Config
-import           Web.Spock.Lucid
 
+import           Action.Audit
 import           Action.UploadImage
 import           Authentication
 import           Config
@@ -56,7 +59,7 @@ launchServer config
   pool <- runStdoutLoggingT $ createPostgresqlPool (toS conn) 5
 
   s <- serverSecret
-  hist <- newTVarIO ""
+  hist <- newTVarIO initialCommandHistory
   let st = ServerState config (ServerSecret s) hist
 
   spockCfg <- defaultSpockCfg Nothing (PCPool pool) st
@@ -75,7 +78,7 @@ httpsServer mware
  = do
   app <- spockAsApp mware
   let serverSettings =
-        defaultSettings & setPort 4000 & setServerName "Raffle App"
+        defaultSettings & setPort 4000 & setServerName "stormcloud"
     -- Run the server using HTTPS and settings
   runTLS defaultTlsSettings serverSettings app
 
@@ -109,6 +112,21 @@ app =
   prehook initHook $ do
     -- User login
     get ("login" <//> var) $ login
+
     prehook authHook $ do
+      get "login-check" $ json True
       post "logout" logout
-      post "upload-image" uploadimage
+
+      get ("retrieve" <//> var) $ \(name::Text) -> do
+       r <- liftIO $ B.readFile "send.jpg"
+       text . toS $ B16.encode r 
+
+    -- File Server Actions
+      post ("store" <//> var) $ \(name::Text) -> do
+        print "Jack sent something!"
+        b <- body
+        bytes b
+
+      get ("delete" <//> var) $ \(name::Text) -> do
+        json True
+

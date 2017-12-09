@@ -1,8 +1,8 @@
-{-# LANGUAGE DeriveAnyClass        #-}
-{-# LANGUAGE DeriveGeneric         #-}
-{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Action.FileServer where
   -- ( FileServerIp(..)
@@ -12,17 +12,22 @@ module Action.FileServer where
   -- , store
   -- ) where
 
-import           Data.Aeson
-import           Data.ByteString    (ByteString)
-import qualified Data.ByteString    as B
-import           Data.List
-import           Data.Monoid
-import           GHC.Generics
-import           GHC.Natural
-import           Network.Simple.TCP
+import Control.Concurrent.STM.TVar
+import Control.Monad
+import Control.Monad.STM
+import Data.Aeson
+import Data.ByteString (ByteString)
+import qualified Data.ByteString as B
+import Data.List
+import Data.Monoid
+import Data.Sequence
+import GHC.Generics
+import GHC.Natural
+import Network.Simple.TCP
 
-import           Action.Encryption
 import Action.Audit
+import Action.Encryption
+import Error
 
 newtype FileServerIp =
   Ip String
@@ -46,13 +51,13 @@ connectWithFileServer config f = do
 testConnect :: IO ()
 testConnect = do
   connect "10.11.199.143" "5555" $ \(sock, addr) -> do
-   send sock "store\r\nhello!\r\n\r\n" 
+    send sock "store\r\nhello!\r\n\r\n"
 
 makeFileRequest ::
      (FileServerConfig config, KeyRing config)
   => config
   -> PlainText (Message ByteString)
-  -> IO (Either String (PlainText (Message ByteString)))
+  -> IO (Either ErrorMessage (PlainText (Message ByteString)))
 makeFileRequest c request =
   connectWithFileServer c $ \(sock, addr) -> do
     sendMessage c request sock
@@ -66,17 +71,101 @@ handshake c =
     pure . flip (either (const False)) response $
       (==) (toPlainText $ Message "handshake" "WUBALUBADUBDUB")
 
-emergency :: (FileServerConfig config, KeyRing config) => ByteString -> config -> IO ()
-emergency m c =
+emergency ::
+     (FileServerConfig config, KeyRing config) => config -> ByteString -> IO ()
+emergency c m =
   connectWithFileServer c $ \(sock, addr) -> do
-    let msg = Message "header" $
-                ("ALL YOUR BASE ARE BELONG TO US:" <> m)
+    let msg = Message "header" $ ("ALL YOUR BASE ARE BELONG TO US:" <> m)
     sendMessage c (toPlainText msg) sock
 
-store :: (FileServerConfig config, KeyRing config) => ByteString -> config -> IO (Either String ())
-store payload c =
+correctHeader :: ByteString -> Message ByteString -> STM (Validation ())
+correctHeader header (Message h payload)
+  | header == h = pure $ pure ()
+  | otherwise =
+    (pure . Left . ErrorMessage $
+     "Recieved header " <> h <> " when expected " <> header)
+
+validateRetrieve ::
+     (Audit config)
+  => config
+  -> ByteString
+  -> Action StorageAction
+  -> Message ByteString
+  -> STM (Validation ByteString)
+validateRetrieve a header ac m@(Message h payload) = do
+  goodHeader <- correctHeader header m
+  sync <- syncedCommandHistory a ac m
+  pure $ do
+    goodHeader
+   -- sync
+    maybe
+      (Left . ErrorMessage $ "Malformed packet")
+      (Right . fst)
+      (breakReturn payload)
+
+syncedCommandHistory ::
+     (Audit config)
+  => config
+  -> Action StorageAction
+  -> Message ByteString
+  -> STM (Validation ())
+syncedCommandHistory c a (Message h payload) = do
+  cmdHist <- readTVar $ cmdHistory c
+  let cmdHist' = cmdHist {storageActions = a <| (storageActions cmdHist)}
+  writeTVar (cmdHistory c) cmdHist'
+  pure $
+    maybe
+      (Left . ErrorMessage $ "Response did not contain history")
+      (flip verifyCommandHistory cmdHist)
+      (snd <$> breakReturn payload)
+
+checkFor :: Monad m => [a -> m (Validation ())] -> a -> m (Validation ())
+checkFor validations input =
+  foldM_ (flip const) () <$> mapM ($ input) validations
+
+store ::
+     (Audit state, FileServerConfig state, KeyRing state)
+  => state
+  -> Action StorageAction
+  -> ByteString
+  -> IO (Validation ())
+store c a =
+  storageCommand a c $
+  checkFor [syncedCommandHistory c a, correctHeader "store"]
+
+retrieve ::
+            (Audit state, FileServerConfig state, KeyRing state)
+  => state
+  -> Action StorageAction
+  -> ByteString
+  -> IO (Validation ByteString)
+retrieve c a =
+  storageCommand a c $
+  validateRetrieve c "retrieve" a
+
+delete ::
+     (Audit state, FileServerConfig state, KeyRing state)
+  => state
+  -> Action StorageAction
+  -> ByteString
+  -> IO (Validation ())
+delete c a =
+  storageCommand a c $
+  correctHeader "delete"
+
+newtype Command =
+  Command ByteString
+
+storageCommand ::
+     (Audit state, FileServerConfig state, KeyRing state)
+  => Action StorageAction
+  -> state
+  -> (Message ByteString -> STM (Validation a))
+  -> ByteString
+  -> IO (Validation a)
+storageCommand a c v payload =
   connectWithFileServer c $ \(sock, addr) -> do
-    let msg = Message "store" $ payload
+    let msg = Message (toHeader a) payload
     sendMessage c (toPlainText msg) sock
     response <- recvMessage c sock
-    pure $ flip fmap response $ \m -> () 
+    either (pure . Left) (atomically . (`validateWith` v)) response

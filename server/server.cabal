@@ -21,7 +21,9 @@ library
                      , Action.FileServer
                      , Action.Parser
                      , Action.Base16
+                     , Action.Audit
                      , Authentication
+                     , Error
                      , Config
                      , DatabaseActions
                      , DatabaseTypes
@@ -35,7 +37,6 @@ library
                      
   build-depends:       base >= 4.9 && < 5
                      , Spock
-                     , Spock-lucid
                      , aeson
                      , base16-bytestring
                      , bytestring
