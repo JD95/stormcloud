@@ -11,6 +11,7 @@
 module App where
 
 import qualified Data.ByteString as B
+import qualified Data.ByteString.Char8 as BC
 import qualified Data.ByteString.Base16 as B16
 import           Control.Concurrent.STM.TVar
 import           Control.Monad.Logger          (LoggingT, runStdoutLoggingT)
@@ -36,6 +37,7 @@ import           Web.Spock.Config
 
 import           Action.Audit
 import           Action.UploadImage
+import Action.FileServer
 import           Authentication
 import           Config
 import           DatabaseActions
@@ -112,21 +114,35 @@ app =
   prehook initHook $ do
     -- User login
     get ("login" <//> var) $ login
+    get "happy" $ do
+      liftIO $ print "happy"
+      text "happy"
+      
+    get ("retrieve" <//> var) $ \(name::Text) -> do
+       liftIO . print $ "jack requested " <> name
+        -- r <- liftIO $ B.readFile "send.jpg"
+       let a = Action undefined undefined Retrieve
+       s <- getState
+       b <- liftIO $ retrieve s a (toS name)
+       either (\e -> print e >> json False) (text . toS . B16.encode) b 
+
+    -- File Server Actions
+    post ("store" <//> var) $ \(name::Text) -> do
+       liftIO $ print $ "Jack sent " <> name
+       b <- body
+       let payload = BC.unlines . List.init . drop 4 . BC.lines $  b
+       let a = Action undefined undefined Retrieve
+       s <- getState
+       b <- liftIO $ store s a (toS name <> "/" <> payload)
+       either (\e -> print e >> json False) (const $ json True) b 
+
+    post ("delete" <//> var) $ \(name::Text) -> do
+       let a = Action undefined undefined Retrieve
+       s <- getState
+       b <- liftIO $ Action.FileServer.delete s a (toS name)
+       either (\e -> print e >> json False) (const $ json True) b 
 
     prehook authHook $ do
       get "login-check" $ json True
       post "logout" logout
-
-      get ("retrieve" <//> var) $ \(name::Text) -> do
-       r <- liftIO $ B.readFile "send.jpg"
-       text . toS $ B16.encode r 
-
-    -- File Server Actions
-      post ("store" <//> var) $ \(name::Text) -> do
-        print "Jack sent something!"
-        b <- body
-        bytes b
-
-      get ("delete" <//> var) $ \(name::Text) -> do
-        json True
 
