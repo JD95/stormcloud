@@ -149,6 +149,10 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="desktop-year-of-the-tiger-images-wallpaper" translatesAutoresizingMaskIntoConstraints="NO" id="Y0h-kU-gjz">
+                                <rect key="frame" x="67" y="342" width="240" height="128"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qh5-lK-ATG">
                                 <rect key="frame" x="0.0" y="83" width="375" height="646"/>
                             </scrollView>
@@ -168,6 +172,7 @@
                     </view>
                     <tabBarItem key="tabBarItem" title="Files" id="4MT-55-Cqm" userLabel="Files"/>
                     <connections>
+                        <outlet property="fakeImageReadIn" destination="Y0h-kU-gjz" id="qha-Yi-zoS"/>
                         <outlet property="scrollView" destination="qh5-lK-ATG" id="Yxw-s5-Njc"/>
                     </connections>
                 </viewController>
@@ -194,4 +199,7 @@
             <point key="canvasLocation" x="1484" y="152"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="desktop-year-of-the-tiger-images-wallpaper" width="1600" height="1200"/>
+    </resources>
 </document>

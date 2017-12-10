@@ -10,7 +10,9 @@ import UIKit
 import GoogleSignIn
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
+class MyAppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
+    static var idToken : String! = "L33tH4CK3R1DT0K3N"
+    
     func sign( signIn: GIDSignIn!, didDisconnectWith user: GIDGoogleUser!, withError error: Error!) {
         NotificationCenter.default.post(
             name: Notification.Name(rawValue: "ToggleAuthUINotification"),
@@ -28,7 +30,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
         } else {
             // Perform any operations on signed in user here.
 //            let userId = user.userID                  // For client-side use only!
-            let idToken = user.authentication.idToken // Safe to send to the server
+            MyAppDelegate.idToken = user.authentication.idToken // Safe to send to the server
             let fullName = user.profile.name
 //            let givenName = user.profile.givenName
 //            let familyName = user.profile.familyName
@@ -40,7 +42,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
                 userInfo: ["statusText": "Signed in: \(fullName!)"])
             // [END_EXCLUDE]
             
-            if postToServer(idToken!) {
+            if postToServer(MyAppDelegate.idToken!) {
                 print("Log-in request was a success!")
             } else {
                 print("Log-in request failed!")
@@ -54,16 +56,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
         let session = URLSession.shared
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        
-//        do {
-//            request.httpBody = try JSONSerialization.data(withJSONObject: userData, options: .prettyPrinted)
-//        } catch let error {
-//            print(error.localizedDescription)
-//            return false
-//        }
-//
-//        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-//        request.addValue("application/json", forHTTPHeaderField: "Accept")
         
         print(request)
         let task = session.dataTask(with: request as URLRequest, completionHandler: { data, response, error in
@@ -84,13 +76,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
                 return
             }
         })
-//        do {
-//
-//
-//        } catch let error {
-//            print(error.localizedDescription)
-//            return false
-//        }
         task.resume()
         print(task.response ?? (task.error ?? "No error or responce."))
         return true
@@ -98,7 +83,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
 
     func accessEndpoint(_ idToken: String) -> Bool {
         print("DOING THE THING!")
-        let url = URL(string: "http://10.11.195.133:4000/happy/")!
+        let url = URL(string: "http://10.11.195.133:4000/login/")!
         let session = URLSession.shared
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
