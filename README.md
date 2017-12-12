@@ -50,3 +50,17 @@ Note that the needed version of libsodium-dev might not be available from the de
 > stack exec server-exe
 
 ## Client Setup
+
+1. Install Xcode 9.x
+
+2. Install CocoaPods
+
+https://guides.cocoapods.org/using/getting-started.html
+
+3. Install required Podfiles
+
+> pod install
+
+4. Open the .xcworkspace file in Xcode
+
+5. Run the application in the simulator using Xcode.
