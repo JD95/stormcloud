@@ -1,21 +1,22 @@
-{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE DataKinds             #-}
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE GADTs                 #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
 {-# LANGUAGE TypeFamilies          #-}
 {-# LANGUAGE TypeOperators         #-}
 
 module App where
 
-import qualified Data.ByteString as B
-import qualified Data.ByteString.Base16 as B16
 import           Control.Concurrent.STM.TVar
 import           Control.Monad.Logger          (LoggingT, runStdoutLoggingT)
 import           Crypto.Random
 import           Data.Aeson                    hiding (json)
+import qualified Data.ByteString               as B
+import qualified Data.ByteString.Base16        as B16
+import qualified Data.ByteString.Char8         as BC
 import           Data.HVect
 import qualified Data.List                     as List
 import           Data.Time.Clock
@@ -35,6 +36,7 @@ import           Web.Spock
 import           Web.Spock.Config
 
 import           Action.Audit
+import           Action.FileServer
 import           Action.UploadImage
 import           Authentication
 import           Config
@@ -106,27 +108,51 @@ withUser from f = do
   user <- fmap findFirst getContext
   f (from user)
 
+logAction action command = do
+  withUser entityVal $ \user -> do
+    t <- liftIO getCurrentTime
+    let a = Action t user action
+    liftIO $ B.appendFile "user-action-log.txt" $
+      show t <> " " <> show user <> " " <> show action
+    command a
+
+logError e = do
+  t <- liftIO getCurrentTime
+  liftIO $ B.appendFile "user-action-log.txt" $
+    show t <> " " <> show e
+
 -- | The routing for the application
 app :: API ()
 app =
   prehook initHook $ do
     -- User login
     get ("login" <//> var) $ login
+    get "happy" $ do
+      liftIO $ print "happy"
+      text "happy"
 
     prehook authHook $ do
       get "login-check" $ json True
       post "logout" logout
 
-      get ("retrieve" <//> var) $ \(name::Text) -> do
-       r <- liftIO $ B.readFile "send.jpg"
-       text . toS $ B16.encode r 
+      get ("retrieve" <//> var) $ \(name::Text) ->
+        logAction Retrieve $ \action -> do
+          s <- getState
+          b <- liftIO $ retrieve s action (toS name)
+          either (\e -> logError e >> json False) (text . toS . B16.encode) b
 
-    -- File Server Actions
       post ("store" <//> var) $ \(name::Text) -> do
-        print "Jack sent something!"
-        b <- body
-        bytes b
+        logAction Store $ \action -> do
+          b <- body
+          let payload = BC.unlines . List.init . drop 4 . BC.lines $  b
+          s <- getState
+          b <- liftIO $ store s action (toS name <> "/" <> payload)
+          either (\e -> logError e >> json False) (const $ json True) b
 
-      get ("delete" <//> var) $ \(name::Text) -> do
-        json True
+      post ("delete" <//> var) $ \(name::Text) -> do
+        logAction Delete $ \action -> do
+          s <- getState
+          b <- liftIO $ Action.FileServer.delete s action (toS name)
+          either (\e -> logError e >> json False) (const $ json True) b
+
 
