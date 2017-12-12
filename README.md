@@ -1,8 +1,16 @@
 # stormcloud
 
 ## Storage Server Setup
+The storage server is implemented in python and must be run with Python3.
+1. Install Pynacl. The remaining python packages base64, os and socket
+come built into most Python3 interpreters. If they are not you can install
+each of the using Pip. 
 
+2. Run 'Python storageServer.py' in the command line.
 
+	Note: The storage server must be active before the authentication server
+makes its first request.
+ 
 ## Auth Server Setup
 
 1. Install libpq-dev, libsodium-dev, and pkg-config
